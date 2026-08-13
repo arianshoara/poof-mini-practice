@@ -1,4 +1,8 @@
-# poof-mini-practice
+# POOF Mini Practice
+
+یک پروژه‌ی تمرینی کوچک برای یادگیری معماری و سازوکارهای اصلی POOF.
+
+## هدف پروژه
 A small learning project for exploring the core architecture of POOF.
 POOF Mini Practice
 
