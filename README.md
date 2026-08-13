@@ -64,3 +64,60 @@ POOF Mini Practice
 Repository ساخته شده است.
 
 قدم بعدی: ساخت فایل "index.html".
+
+# POOF Mini Practice
+
+A small learning project for exploring the core architecture of POOF.
+
+## Purpose
+
+POOF Mini Practice is not the production version of POOF.
+
+It is a small experimental project for learning how the core mechanisms of a language-learning application work, including:
+
+- Multi-page navigation
+- Data-driven interfaces
+- JSON data
+- Dictionary entries
+- Personal cards
+- Local storage
+- Theme management
+- Learning progress
+- Connections between stories, dictionary entries, and cards
+
+The main goal is to understand each part before building the larger POOF application.
+
+## Current Scope
+
+The first versions use:
+
+- HTML
+- CSS
+- Vanilla JavaScript
+- JSON
+- localStorage
+- GitHub Pages
+
+The project currently has no:
+
+- Backend
+- Real database
+- Authentication
+- Artificial intelligence
+- External dictionary API
+- Framework
+
+These technologies may be added in later practice versions.
+
+## Core Learning Flow
+
+```text
+Story or Lesson
+      ↓
+Selected Word
+      ↓
+Dictionary Entry
+      ↓
+Personal Card
+      ↓
+Cards Collection
