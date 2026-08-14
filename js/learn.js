@@ -1,5 +1,88 @@
 const lessonList = document.getElementById("lesson-list");
-const lessonStatus = document.getElementById("lesson-status");
+
+function showMessage(message) {
+    const messageElement = document.createElement("p");
+
+    messageElement.id = "lesson-status";
+    messageElement.textContent = message;
+
+    lessonList.replaceChildren(messageElement);
+}
+
+function createLessonCard(lesson) {
+    const card = document.createElement("article");
+    card.className = "lesson-card";
+    card.dataset.lessonId = lesson.id;
+
+    const header = document.createElement("div");
+    header.className = "lesson-card__header";
+
+    const number = document.createElement("span");
+    number.className = "lesson-card__number";
+    number.textContent = `Lesson ${lesson.order}`;
+
+    const level = document.createElement("span");
+    level.className = "lesson-card__level";
+    level.textContent = lesson.level;
+
+    const title = document.createElement("h3");
+    title.className = "lesson-card__title";
+    title.textContent = lesson.title;
+
+    const description = document.createElement("p");
+    description.className = "lesson-card__description";
+    description.textContent = lesson.description;
+
+    const footer = document.createElement("div");
+    footer.className = "lesson-card__footer";
+
+    const duration = document.createElement("span");
+    duration.textContent = `${lesson.estimated_minutes} min`;
+
+    const status = document.createElement("span");
+    status.className = "lesson-card__status";
+
+    if (lesson.status === "available") {
+        status.textContent = "Available";
+        status.classList.add("is-available");
+    } else {
+        status.textContent = "Coming soon";
+        status.classList.add("is-coming-soon");
+    }
+
+    header.append(number, level);
+    footer.append(duration, status);
+
+    card.append(
+        header,
+        title,
+        description,
+        footer
+    );
+
+    return card;
+}
+
+function renderLessons(lessons) {
+    if (lessons.length === 0) {
+        showMessage("No lessons are available yet.");
+        return;
+    }
+
+    const lessonFragment = document.createDocumentFragment();
+
+    const sortedLessons = [...lessons].sort(
+        (firstLesson, secondLesson) =>
+            firstLesson.order - secondLesson.order
+    );
+
+    sortedLessons.forEach((lesson) => {
+        const lessonCard = createLessonCard(lesson);
+        lessonFragment.append(lessonCard);
+    });
+
+    lessonList.replaceChildren(lessonFragment);
+}
 
 async function loadLessons() {
     try {
@@ -15,9 +98,9 @@ async function loadLessons() {
             throw new Error("Lesson data must be an array.");
         }
 
-        lessonStatus.textContent = `${lessons.length} lessons loaded.`;
+        renderLessons(lessons);
     } catch (error) {
-        lessonStatus.textContent = "Lessons could not be loaded.";
+        showMessage("Lessons could not be loaded.");
         console.error("Failed to load lessons:", error);
     }
 }
