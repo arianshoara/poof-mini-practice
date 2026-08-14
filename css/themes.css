@@ -1,0 +1,38 @@
+/* Classic theme */
+:root {
+    --color-background: #111111;
+    --color-surface: #1b1814;
+
+    --color-text: #f5f1e8;
+    --color-text-muted: #b8b0a4;
+    --color-accent: #e6b96f;
+
+    --color-border: #4a4032;
+
+    --color-nav-background: rgba(27, 24, 20, 0.78);
+    --color-nav-border: rgba(230, 185, 111, 0.25);
+    --color-nav-hover: rgba(230, 185, 111, 0.08);
+    --color-nav-active: rgba(230, 185, 111, 0.12);
+
+    --shadow-nav: 0 12px 32px rgba(0, 0, 0, 0.45);
+}
+
+
+/* Snowy theme */
+html[data-theme="snowy"] {
+    --color-background: #081421;
+    --color-surface: #10263a;
+
+    --color-text: #f3f8fc;
+    --color-text-muted: #b8c7d3;
+    --color-accent: #f3c879;
+
+    --color-border: #294861;
+
+    --color-nav-background: rgba(11, 29, 45, 0.78);
+    --color-nav-border: rgba(185, 220, 244, 0.28);
+    --color-nav-hover: rgba(185, 220, 244, 0.10);
+    --color-nav-active: rgba(243, 200, 121, 0.16);
+
+    --shadow-nav: 0 12px 32px rgba(0, 8, 16, 0.55);
+}
