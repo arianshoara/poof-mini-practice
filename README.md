@@ -98,7 +98,7 @@ POOF Mini Practice نسخه‌ی اصلی و Production پروژه‌ی POOF ن�
 
 موارد باقی‌مانده:
 
-- [ ] هماهنگ‌کردن تم پیش‌فرض CSS و JavaScript
+- [x] هماهنگ‌کردن تم پیش‌فرض CSS و JavaScript
 - [ ] آزمایش نهایی Classic و Snowy
 - [ ] آزمایش Refresh و جابه‌جایی میان صفحات
 - [ ] آزمایش کامل Navigation با محتوای بلند
