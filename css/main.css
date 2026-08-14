@@ -19,7 +19,7 @@ header {
 }
 
 main {
-    padding: 32px 24px 120px;
+    padding: 32px 24px calc(140px + env(safe-area-inset-bottom, 0px));
 }
 
 h1 {
