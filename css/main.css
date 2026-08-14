@@ -35,8 +35,13 @@ p {
 }
 
 nav {
+    position: fixed;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    z-index: 100;
     background-color: #1b1814;
-    border-bottom: 1px solid #4a4032;
+    border-top: 1px solid #4a4032;
 }
 
 nav ul {
