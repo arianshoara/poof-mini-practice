@@ -1,9 +1,12 @@
 const lessonList = document.getElementById("lesson-list");
 
-function showMessage(message) {
+function showMessage(message, state) {
     const messageElement = document.createElement("p");
 
     messageElement.id = "lesson-status";
+    messageElement.className =
+        `lesson-message lesson-message--${state}`;
+
     messageElement.textContent = message;
 
     lessonList.replaceChildren(messageElement);
@@ -66,6 +69,7 @@ function createLessonCard(lesson) {
 function renderLessons(lessons) {
     if (lessons.length === 0) {
         showMessage("No lessons are available yet.");
+        "empty"
         return;
     }
 
@@ -101,6 +105,7 @@ async function loadLessons() {
         renderLessons(lessons);
     } catch (error) {
         showMessage("Lessons could not be loaded.");
+        "error"
         console.error("Failed to load lessons:", error);
     }
 }
