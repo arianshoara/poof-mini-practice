@@ -62,10 +62,41 @@
 فعلاً هدف فقط ساخت ساختار اولیه و Navigation میان این صفحه‌هاست.
 
 وضعیت پروژه
+## نسخه‌ی فعلی
 
-Repository ساخته شده است.
+### v0.1.0 — Skeleton ✅
 
-قدم بعدی: ساخت فایل "index.html".
+اولین مرحله‌ی POOF Mini Practice تکمیل شده است.
+
+موارد تکمیل‌شده:
+
+* [x] ساخت Repository
+* [x] نوشتن README
+* [x] انتشار سایت با GitHub Pages
+* [x] ساخت صفحات Home، Learn، Library، Cards و Account
+* [x] اتصال تمام صفحات به CSS مشترک
+* [x] ساخت Navigation مشترک با JavaScript
+* [x] تشخیص خودکار صفحه‌ی فعال
+* [x] طراحی Navigation پنج‌ستونه
+* [x] ثابت‌کردن Navigation در پایین نمایشگر
+* [x] ساخت ظاهر شناور و شیشه‌ای برای Navigation
+* [x] آزمایش صفحات در مرورگرهای مختلف
+
+در این نسخه هنوز داده، دیکشنری، کارت واقعی، حساب کاربری، Backend و هوش مصنوعی وجود ندارد.
+
+## مرحله‌ی بعد
+
+### v0.2.0 — Theme System
+
+در مرحله‌ی بعد سیستم تم اولیه‌ی POOF ساخته می‌شود:
+
+* Classic Theme
+* Snowy Theme
+* CSS Variables
+* تغییر تم با JavaScript
+* ذخیره‌ی تم انتخاب‌شده در localStorage
+* باقی‌ماندن تم بعد از Refresh
+* 
 
 # POOF Mini Practice
 
