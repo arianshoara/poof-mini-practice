@@ -187,3 +187,16 @@ h1,
         transform 0.2s ease;
         transform: scale(0.97);
 }
+
+@media (prefers-reduced-motion: reduce) {
+    body,
+    header,
+    h1,
+    .theme-settings,
+    .theme-option,
+    .theme-option-description,
+    #main-navigation,
+    #main-navigation a {
+        transition: none;
+    }
+}
