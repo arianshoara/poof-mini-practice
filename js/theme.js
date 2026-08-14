@@ -1,5 +1,5 @@
 const THEME_STORAGE_KEY = "poof-theme";
-const DEFAULT_THEME = "snowy";
+const DEFAULT_THEME = "classic";
 
 const AVAILABLE_THEMES = [
     "classic",
