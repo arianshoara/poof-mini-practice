@@ -185,4 +185,5 @@ h1,
         border-color 0.3s ease,
         box-shadow 0.3s ease,
         transform 0.2s ease;
+        transform: scale(0.97);
 }
