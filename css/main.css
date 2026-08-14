@@ -36,9 +36,11 @@ p {
 
 #main-navigation {
     position: fixed;
+
     right: 16px;
-    bottom: calc(12px + env(safe-area-inset-bottom));
+    bottom: calc(16px + env(safe-area-inset-bottom, 0px));
     left: 16px;
+
     z-index: 100;
 
     background-color: var(--color-nav-background);
