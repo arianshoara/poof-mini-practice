@@ -116,30 +116,65 @@ p {
     color: var(--color-text-muted);
 }
 
-.theme-button {
-    width: 100%;
-    padding: 14px 20px;
+.theme-options {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+}
 
-    color: var(--color-accent);
-    background-color: var(--color-nav-active);
+.theme-option {
+    padding: 16px;
+
+    color: var(--color-text);
+    background-color: transparent;
 
     border: 1px solid var(--color-border);
-    border-radius: 14px;
+    border-radius: 16px;
 
     font: inherit;
-    font-weight: bold;
+    text-align: left;
     cursor: pointer;
 
     transition:
+        color 0.2s ease,
         background-color 0.2s ease,
+        border-color 0.2s ease,
         transform 0.2s ease;
 }
 
-.theme-button:active {
+.theme-option-title {
+    display: block;
+    margin-bottom: 4px;
+
+    font-weight: bold;
+}
+
+.theme-option-description {
+    display: block;
+
+    color: var(--color-text-muted);
+    font-size: 14px;
+}
+
+.theme-option:hover {
+    background-color: var(--color-nav-hover);
+}
+
+.theme-option:active {
     transform: scale(0.97);
 }
 
-.theme-button:focus-visible {
+.theme-option.selected {
+    color: var(--color-accent);
+    background-color: var(--color-nav-active);
+    border-color: var(--color-accent);
+}
+
+.theme-option.selected .theme-option-description {
+    color: var(--color-accent);
+}
+
+.theme-option:focus-visible {
     outline: 3px solid var(--color-accent);
     outline-offset: 3px;
 }
