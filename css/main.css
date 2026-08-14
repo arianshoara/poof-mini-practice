@@ -132,3 +132,50 @@ p {
     background-color: var(--color-nav-active);
     font-weight: bold;
 }
+
+.theme-settings {
+    margin-top: 32px;
+    padding: 24px;
+
+    background-color: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: 20px;
+}
+
+.theme-settings h3 {
+    margin: 0 0 8px;
+    color: var(--color-accent);
+}
+
+.theme-settings p {
+    margin-bottom: 20px;
+    color: var(--color-text-muted);
+}
+
+.theme-button {
+    width: 100%;
+    padding: 14px 20px;
+
+    color: var(--color-accent);
+    background-color: var(--color-nav-active);
+
+    border: 1px solid var(--color-border);
+    border-radius: 14px;
+
+    font: inherit;
+    font-weight: bold;
+    cursor: pointer;
+
+    transition:
+        background-color 0.2s ease,
+        transform 0.2s ease;
+}
+
+.theme-button:active {
+    transform: scale(0.97);
+}
+
+.theme-button:focus-visible {
+    outline: 3px solid var(--color-accent);
+    outline-offset: 3px;
+}
