@@ -191,6 +191,26 @@ h1,
         transform 0.2s ease;
 }
 
+#main-navigation {
+    will-change: transform, opacity;
+}
+
+#main-navigation.navigation-hidden {
+    opacity: 0;
+
+    transform: translateY(
+        calc(100% + 48px + env(safe-area-inset-bottom, 0px))
+    );
+
+    pointer-events: none;
+}
+
+#main-navigation:focus-within {
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: auto;
+}
+
 @media (prefers-reduced-motion: reduce) {
     body,
     header,
