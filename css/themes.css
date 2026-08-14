@@ -1,4 +1,4 @@
-/* Classic theme */
+/* Classic theme and default fallback */
 :root {
     --color-background: #111111;
     --color-surface: #1b1814;
