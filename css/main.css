@@ -74,6 +74,7 @@ p {
     text-decoration: none;
 
     border-radius: 18px;
+    -webkit-tap-highlight-color: transparent;
 
     transition:
         color 0.2s ease,
