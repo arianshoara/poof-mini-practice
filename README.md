@@ -74,9 +74,9 @@ POOF Mini Practice نسخه‌ی اصلی و Production پروژه‌ی POOF ن�
 - [x] ساخت ظاهر شناور و شیشه‌ای Navigation
 - [x] انتشار Tag و Release نسخه‌ی v0.1.0
 
-### v0.2.0 — Interface Foundation 🚧
+### v0.2.0 — Interface Foundation ✅
 
-این نسخه در حال توسعه است.
+این Milestone تکمیل شده و آماده‌ی انتشار است.
 
 موارد پیاده‌سازی‌شده:
 
@@ -99,10 +99,10 @@ POOF Mini Practice نسخه‌ی اصلی و Production پروژه‌ی POOF ن�
 موارد باقی‌مانده:
 
 - [x] هماهنگ‌کردن تم پیش‌فرض CSS و JavaScript
-- [ ] آزمایش نهایی Classic و Snowy
-- [ ] آزمایش Refresh و جابه‌جایی میان صفحات
+- [x] آزمایش نهایی Classic و Snowy
+- [x] آزمایش Refresh و جابه‌جایی میان صفحات
 - [ ] آزمایش کامل Navigation با محتوای بلند
-- [ ] بازبینی مستندات
+- [x] بازبینی مستندات
 - [ ] ساخت Tag و Release نسخه‌ی v0.2.0
 
 قابلیت مخفی‌شدن Navigation هنوز Provisional است و هنگام اضافه‌شدن محتوای واقعی Learn دوباره آزمایش خواهد شد.
