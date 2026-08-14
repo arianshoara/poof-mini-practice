@@ -6,6 +6,7 @@
     --color-text: #f5f1e8;
     --color-text-muted: #b8b0a4;
     --color-accent: #e6b96f;
+    --color-error: #ff8f87;
 
     --color-border: #4a4032;
 
@@ -26,6 +27,7 @@ html[data-theme="snowy"] {
     --color-text: #f3f8fc;
     --color-text-muted: #b8c7d3;
     --color-accent: #f3c879;
+    --color-error: #ff9d9d;
 
     --color-border: #294861;
 
