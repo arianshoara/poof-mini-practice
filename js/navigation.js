@@ -3,10 +3,10 @@ const navigation = document.querySelector("#main-navigation");
 navigation.innerHTML = `
     <ul>
         <li><a href="account.html">Account</a></li>
-        <li><a href="library.html">Library</a></li>
+        <li><a href="learn.html">Learn</a></li>
         <li><a href="index.html">Home</a></li>
         <li><a href="cards.html">Cards</a></li>
-        <li><a href="learn.html">Learn</a></li>
+        <li><a href="library.html">Library</a></li>
     </ul>
 `;
 
