@@ -22,15 +22,38 @@
     <h2>Account</h2>
     <p>Your profile and settings will appear here.</p>
     
-    <section class="theme-settings">
-      
-     <h3>Theme</h3>
-     <p id="theme-status">Current theme: Snowy</p>
+    <section class="theme-settings" aria-labelledby="theme-heading">
+    <h3 id="theme-heading">Theme</h3>
 
-     <button id="theme-toggle" class="theme-button" type="button">
-     Switch to Classic
-     </button>
-      
+    <p id="theme-status" aria-live="polite">
+        Current theme: Snowy
+    </p>
+
+     <div class="theme-options">
+        <button
+            class="theme-option"
+            type="button"
+            data-theme-value="classic"
+            aria-pressed="false"
+        >
+            <span class="theme-option-title">Classic</span>
+            <span class="theme-option-description">
+                Warm and dark
+            </span>
+        </button>
+
+        <button
+            class="theme-option"
+            type="button"
+            data-theme-value="snowy"
+            aria-pressed="false"
+        >
+            <span class="theme-option-title">Snowy</span>
+            <span class="theme-option-description">
+                Cold and peaceful
+            </span>
+        </button>
+     </div>
     </section>
     
   </main>
