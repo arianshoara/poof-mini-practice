@@ -35,13 +35,20 @@ Theme values are defined as CSS custom properties inside:
 
 ```text
 css/themes.css
+```
 The active theme is stored on the root HTML element:
+```
 <html data-theme="snowy">
+```
 Shared components continue to use the same variables:
+```
 color: var(--color-text);
 background-color: var(--color-background);
+```
 The JavaScript file responsible for applying and changing themes is:
+```
 js/theme.js
+```
 Consequences
 Positive consequences:
 Pages do not need separate theme-specific HTML.
@@ -94,9 +101,13 @@ Return after meaningful upward scrolling
 Ignore very small scroll movements
 Remain visible on pages without scrolling
 The behavior is controlled by:
+```
 js/navigation.js
+```
 The visual hidden state is controlled by:
+```
 .navigation-hidden
+```
 Consequences
 Positive consequences:
 More screen space is available while reading.
