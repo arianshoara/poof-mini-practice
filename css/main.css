@@ -20,6 +20,24 @@
     --shadow-nav: 0 12px 32px rgba(0, 0, 0, 0.45);
 }
 
+html[data-theme="snowy"] {
+    --color-background: #081421;
+    --color-surface: #10263a;
+
+    --color-text: #f3f8fc;
+    --color-text-muted: #b8c7d3;
+    --color-accent: #f3c879;
+
+    --color-border: #294861;
+
+    --color-nav-background: rgba(11, 29, 45, 0.78);
+    --color-nav-border: rgba(185, 220, 244, 0.28);
+    --color-nav-hover: rgba(185, 220, 244, 0.10);
+    --color-nav-active: rgba(243, 200, 121, 0.16);
+
+    --shadow-nav: 0 12px 32px rgba(0, 8, 16, 0.55);
+}
+
 body {
     margin: 0;
     min-height: 100vh;
@@ -80,7 +98,6 @@ p {
 
 #main-navigation li {
     text-align: center;
-    color: var(--color-text-muted);
 }
 
 #main-navigation a,
@@ -88,7 +105,7 @@ p {
     display: block;
     padding: 12px 2px;
 
-    color: #b8b0a4;
+    color: var(--color-text-muted);
     font-size: 14px;
     text-decoration: none;
 
