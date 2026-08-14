@@ -75,11 +75,6 @@ p {
 
     border-radius: 18px;
     -webkit-tap-highlight-color: transparent;
-
-    transition:
-        color 0.2s ease,
-        background-color 0.2s ease,
-        transform 0.2s ease;
 }
 
 #main-navigation a:hover {
@@ -135,11 +130,7 @@ p {
     text-align: left;
     cursor: pointer;
 
-    transition:
-        color 0.2s ease,
-        background-color 0.2s ease,
-        border-color 0.2s ease,
-        transform 0.2s ease;
+    
 }
 
 .theme-option-title {
@@ -177,4 +168,21 @@ p {
 .theme-option:focus-visible {
     outline: 3px solid var(--color-accent);
     outline-offset: 3px;
+}
+
+
+body,
+header,
+h1,
+.theme-settings,
+.theme-option,
+.theme-option-description,
+#main-navigation,
+#main-navigation a {
+    transition:
+        color 0.3s ease,
+        background-color 0.3s ease,
+        border-color 0.3s ease,
+        box-shadow 0.3s ease,
+        transform 0.2s ease;
 }
