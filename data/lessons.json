@@ -1,0 +1,29 @@
+[
+  {
+    "id": "lesson_001",
+    "order": 1,
+    "title": "Greetings",
+    "level": "A1",
+    "description": "Learn basic German greetings.",
+    "estimated_minutes": 5,
+    "status": "available"
+  },
+  {
+    "id": "lesson_002",
+    "order": 2,
+    "title": "Introducing Yourself",
+    "level": "A1",
+    "description": "Learn how to introduce yourself in German.",
+    "estimated_minutes": 7,
+    "status": "available"
+  },
+  {
+    "id": "lesson_003",
+    "order": 3,
+    "title": "Numbers 1–10",
+    "level": "A1",
+    "description": "Learn the German numbers from one to ten.",
+    "estimated_minutes": 6,
+    "status": "coming_soon"
+  }
+]
