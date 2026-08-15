@@ -1,5 +1,8 @@
 const lessonList = document.getElementById("lesson-list");
 
+const testState =
+    new URLSearchParams(window.location.search).get("state");
+
 function showMessage(message, state) {
     const messageElement = document.createElement("p");
 
@@ -69,7 +72,7 @@ function createLessonCard(lesson) {
 function renderLessons(lessons) {
     if (lessons.length === 0) {
         showMessage("No lessons are available yet.");
-    
+        "empty"
         return;
     }
 
@@ -90,10 +93,24 @@ function renderLessons(lessons) {
 
 async function loadLessons() {
     try {
-        const response = await fetch("data/lessons.json");
+        if (testState === "loading") {
+            return;
+        }
+
+        if (testState === "empty") {
+            renderLessons([]);
+            return;
+        }
+
+        const lessonDataPath =
+            testState === "error"
+                ? "data/missing-lessons.json"
+                : "data/lessons.json";
+
+        const response = await fetch(lessonDataPath);
 
         if (!response.ok) {
-            throw new Error(`HTTP error: ${response.status}`);
+            throw new Error(HTTP error: ${response.status});
         }
 
         const lessons = await response.json();
@@ -104,8 +121,11 @@ async function loadLessons() {
 
         renderLessons(lessons);
     } catch (error) {
-        showMessage("Lessons could not be loaded.");
-        
+        showMessage(
+            "Lessons could not be loaded.",
+            "error"
+        );
+
         console.error("Failed to load lessons:", error);
     }
 }
