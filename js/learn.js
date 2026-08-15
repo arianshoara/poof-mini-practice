@@ -69,7 +69,7 @@ function createLessonCard(lesson) {
 function renderLessons(lessons) {
     if (lessons.length === 0) {
         showMessage("No lessons are available yet.");
-        "empty"
+    
         return;
     }
 
@@ -105,7 +105,7 @@ async function loadLessons() {
         renderLessons(lessons);
     } catch (error) {
         showMessage("Lessons could not be loaded.");
-        "error"
+        
         console.error("Failed to load lessons:", error);
     }
 }
