@@ -8,7 +8,7 @@ function showMessage(message, state) {
 
     messageElement.id = "lesson-status";
     messageElement.className =
-        "lesson-message lesson-message--"+{state};
+        "lesson-message lesson-message--" + state;
 
     messageElement.textContent = message;
 
@@ -44,7 +44,7 @@ function createLessonCard(lesson) {
 
     const duration = document.createElement("span");
     duration.textContent =
-    lesson.estimated_minutes + " min";
+        lesson.estimated_minutes + " min";
 
     const status = document.createElement("span");
     status.className = "lesson-card__status";
@@ -73,13 +73,15 @@ function createLessonCard(lesson) {
 function renderLessons(lessons) {
     if (lessons.length === 0) {
         showMessage(
-    "No lessons are available yet.",
-    "empty"
-);
+            "No lessons are available yet.",
+            "empty"
+        );
 
-return;
+        return;
+    }
 
-    const lessonFragment = document.createDocumentFragment();
+    const lessonFragment =
+        document.createDocumentFragment();
 
     const sortedLessons = [...lessons].sort(
         (firstLesson, secondLesson) =>
@@ -113,17 +115,18 @@ async function loadLessons() {
         const response = await fetch(lessonDataPath);
 
         if (!response.ok) {
-            throw new Error(`HTTP error: ${response.status`});
+            throw new Error(
+                "HTTP error: " + response.status
+            );
         }
 
         const lessons = await response.json();
 
         if (!Array.isArray(lessons)) {
             throw new Error(
-    "HTTP error: " + response.status
-);
+                "Lesson data must be an array."
+            );
         }
-
         renderLessons(lessons);
     } catch (error) {
         showMessage(
@@ -131,7 +134,10 @@ async function loadLessons() {
             "error"
         );
 
-        console.error("Failed to load lessons:", error);
+        console.error(
+            "Failed to load lessons:",
+            error
+        );
     }
 }
 
