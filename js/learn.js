@@ -110,7 +110,7 @@ async function loadLessons() {
         const response = await fetch(lessonDataPath);
 
         if (!response.ok) {
-            throw new Error(HTTP error: ${response.status});
+            throw new Error(`HTTP error: ${response.status`});
         }
 
         const lessons = await response.json();
