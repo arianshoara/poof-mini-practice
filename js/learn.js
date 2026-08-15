@@ -8,7 +8,7 @@ function showMessage(message, state) {
 
     messageElement.id = "lesson-status";
     messageElement.className =
-        `lesson-message lesson-message--${state}`;
+        "lesson-message lesson-message--"+{state};
 
     messageElement.textContent = message;
 
@@ -25,7 +25,7 @@ function createLessonCard(lesson) {
 
     const number = document.createElement("span");
     number.className = "lesson-card__number";
-    number.textContent = `Lesson ${lesson.order}`;
+    number.textContent = "Lesson " + lesson.order;
 
     const level = document.createElement("span");
     level.className = "lesson-card__level";
@@ -43,7 +43,8 @@ function createLessonCard(lesson) {
     footer.className = "lesson-card__footer";
 
     const duration = document.createElement("span");
-    duration.textContent = `${lesson.estimated_minutes} min`;
+    duration.textContent =
+    lesson.estimated_minutes + " min";
 
     const status = document.createElement("span");
     status.className = "lesson-card__status";
@@ -71,10 +72,12 @@ function createLessonCard(lesson) {
 
 function renderLessons(lessons) {
     if (lessons.length === 0) {
-        showMessage("No lessons are available yet.");
-        "empty"
-        return;
-    }
+        showMessage(
+    "No lessons are available yet.",
+    "empty"
+);
+
+return;
 
     const lessonFragment = document.createDocumentFragment();
 
@@ -116,7 +119,9 @@ async function loadLessons() {
         const lessons = await response.json();
 
         if (!Array.isArray(lessons)) {
-            throw new Error("Lesson data must be an array.");
+            throw new Error(
+    "HTTP error: " + response.status
+);
         }
 
         renderLessons(lessons);
