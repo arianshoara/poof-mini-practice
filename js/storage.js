@@ -217,6 +217,24 @@ function getCards() {
     return [...storageData.cards];
 }
 
+function getCardById(cardId) {
+    if (!isNonEmptyString(cardId)) {
+        return null;
+    }
+
+    const cards = getCards();
+
+    const matchingCard = cards.find(
+        (card) => card.id === cardId
+    );
+
+    if (matchingCard === undefined) {
+        return null;
+    }
+
+    return matchingCard;
+}
+
 function addCard(cardInput) {
     if (!isValidCardInput(cardInput)) {
         console.error(
@@ -307,6 +325,7 @@ function deleteCard(cardId) {
 
 window.poofStorage = {
     getCards,
+    getCardById,
     addCard,
     deleteCard
 };
