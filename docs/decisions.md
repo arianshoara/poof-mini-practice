@@ -97,7 +97,7 @@ Limitations:
 
 ## Decision 003 — Auto-Hide Bottom Navigation While Reading
 
-**Status:** Provisional  
+**Status:** Accepted
 **Date:** 2026-08-14
 
 ### Context
@@ -137,8 +137,242 @@ Risks:
 - Users may not immediately understand where the navigation went.
 - The behavior requires testing with real long-form content.
 
-### Validation Status
+### Validation Result
 
-The implementation exists, but the current pages do not contain enough content for complete testing.
+This behavior was reviewed during the data-driven Learn milestone after the Learn page received enough lesson content to create meaningful vertical scrolling.
 
-This decision must be reviewed during the data-driven Learn milestone.
+The navigation was tested with the longer Learn page, particularly on mobile screens.
+
+The tests confirmed that:
+
+- The navigation remains visible when the page first opens.
+- It remains visible near the top of the page.
+- It hides during meaningful downward scrolling.
+- It returns during upward scrolling.
+- Small scroll movements do not cause excessive flickering.
+- The transition works smoothly in both directions.
+- The navigation does not prevent access to lesson content.
+
+The behavior is now accepted for the current version of POOF Mini Practice.
+
+It may still be reviewed again when longer lessons and stories are introduced.
+
+---
+
+## Decision 004 — Build Learn as a Data-Driven Interface
+
+**Status:** Accepted  
+**Date:** 2026-08-16
+
+### Context
+
+The Learn page needs to display a growing collection of language lessons.
+
+One possible approach was to write every lesson card directly inside `learn.html`.
+
+That approach would mix lesson data with page structure and create repeated HTML. Adding, removing, reordering, or updating lessons would require manually editing the HTML page.
+
+This would become difficult to maintain as the number of lessons increases.
+
+POOF Mini Practice also needs to practice an important architectural principle from the larger POOF project: shared content data should remain separate from the interface that displays it.
+
+### Decision
+
+The Learn page will use a data-driven architecture.
+
+Shared lesson information is stored in:
+
+`data/lessons.json`
+
+The page structure remains inside:
+
+`learn.html`
+
+The behavior responsible for loading, validating, sorting, and rendering lessons is located in:
+
+`js/learn.js`
+
+The HTML page provides the initial Learn structure and the lesson container.
+
+JavaScript receives lesson data and creates the lesson cards dynamically using DOM methods such as:
+
+- `document.createElement()`
+- `append()`
+- `replaceChildren()`
+- `createDocumentFragment()`
+
+Lesson cards will not be written repeatedly by hand inside `learn.html`.
+
+### Lesson Data Contract
+
+Every lesson must contain the following properties:
+
+- `id`
+- `order`
+- `title`
+- `description`
+- `level`
+- `estimated_minutes`
+- `status`
+
+The properties must follow these rules:
+
+- `id` must be a non-empty string.
+- `order` must be a positive integer.
+- `title` must be a non-empty string.
+- `description` must be a non-empty string.
+- `level` must be a non-empty string.
+- `estimated_minutes` must be a positive number.
+- `status` must be either `available` or `coming_soon`.
+
+Lesson identifiers must be unique.
+
+Lesson order values must also be unique.
+
+The `id` represents the stable identity of a lesson.
+
+The `order` controls the visual learning sequence and may be used to sort lessons before rendering.
+
+### Validation Strategy
+
+Lesson data is validated before it is rendered.
+
+The application checks:
+
+1. Whether the received data is an array.
+2. Whether every lesson follows the lesson data contract.
+3. Whether lesson identifiers are unique.
+4. Whether lesson order values are unique.
+
+If any validation fails, the lesson cards are not rendered.
+
+Instead, the Learn page displays an error state.
+
+This prevents partially invalid lesson data from silently creating broken or inconsistent interfaces.
+
+### Rendering Strategy
+
+Lessons are sorted by their `order` property before rendering.
+
+A new lesson card element is created for every valid lesson.
+
+Each card displays:
+
+- Lesson number
+- Language level
+- Lesson title
+- Lesson description
+- Estimated duration
+- Availability status
+
+The created cards are first added to a `DocumentFragment`.
+
+The completed fragment is then inserted into the lesson container.
+
+This reduces repeated direct updates to the page while the cards are being constructed.
+
+### Interface States
+
+The Learn page supports four interface states:
+
+- Loading
+- Success
+- Empty
+- Error
+
+The initial HTML contains the Loading state.
+
+After the data request finishes:
+
+- Valid lesson data produces the Success state.
+- An empty lesson array produces the Empty state.
+- A failed request or invalid data produces the Error state.
+
+The page must not be designed only for the successful response.
+
+### Separation of Responsibilities
+
+The responsibilities are divided as follows:
+
+`data/lessons.json`
+
+- Stores shared lesson information.
+- Acts as the current source of lesson data.
+- Does not contain HTML or visual styling.
+- Does not store personal user progress.
+
+`learn.html`
+
+- Defines the semantic structure of the Learn page.
+- Provides the lesson container.
+- Provides the initial Loading state.
+- Does not contain repeated lesson cards.
+
+`js/learn.js`
+
+- Requests the lesson data.
+- Validates the received data.
+- Sorts the lessons.
+- Creates lesson card elements.
+- Manages Loading, Empty, Error, and Success states.
+
+`css/main.css`
+
+- Controls the visual presentation of the Learn page.
+- Styles lesson cards and interface states.
+- Uses shared theme variables instead of lesson-specific hard-coded theme colors.
+
+### Consequences
+
+Positive consequences:
+
+- Lesson data is separated from page structure.
+- New lessons can be added without copying HTML card structures.
+- All lesson cards follow one rendering implementation.
+- Lessons can be reordered through data.
+- Invalid lesson data is detected before rendering.
+- Loading, Empty, Error, and Success states are handled explicitly.
+- The Learn interface works with both Classic and Snowy themes.
+- The current JSON source can later be replaced by an API or database.
+- The rendering layer does not need to know where the data ultimately comes from.
+
+Trade-offs:
+
+- The Learn page depends on JavaScript to display lesson cards.
+- A failed JSON request prevents lessons from appearing.
+- Data validation adds more code and must remain synchronized with the lesson structure.
+- Changes to the lesson data contract may require updates to both the JSON data and the validation logic.
+- Manual testing is currently required because automated tests have not yet been introduced.
+
+### Current Limitations
+
+The current lesson data is static and public.
+
+The Learn system does not yet support:
+
+- Opening a complete lesson
+- Personal lesson progress
+- Completed or locked lesson states
+- User-specific availability
+- Lesson exercises
+- Lesson vocabulary
+- Audio
+- Review scheduling
+- Database synchronization
+
+These capabilities are outside the scope of the current milestone.
+
+### Future Impact
+
+In future versions, `data/lessons.json` may be replaced by:
+
+- Supabase
+- A PostgreSQL database
+- A backend API
+- Another content service
+
+The Learn page should continue to receive lesson objects through a defined data contract.
+
+Personal user data, such as lesson progress or completion status, must not be stored inside the shared lesson catalog.
+
+That information will require a separate storage layer and, later, a user-specific database model.
