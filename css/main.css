@@ -880,3 +880,66 @@ h1,
 .saved-card-search__input::-webkit-search-cancel-button {
     cursor: pointer;
 }
+
+
+/* =========================================================
+   SAVED CARD SORT
+   ========================================================= */
+
+.saved-card-sort {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 14px;
+
+    margin: 0 0 18px;
+}
+
+.saved-card-sort__label {
+    color: var(--color-text);
+    font-size: 14px;
+    font-weight: bold;
+}
+
+.saved-card-sort__select {
+    min-width: 160px;
+    padding: 9px 36px 9px 12px;
+
+    color: var(--color-text);
+    background-color: var(--color-surface);
+
+    border: 1px solid var(--color-border);
+    border-radius: 11px;
+
+    font: inherit;
+    cursor: pointer;
+}
+
+.saved-card-sort__select:hover {
+    border-color: var(--color-accent);
+}
+
+.saved-card-sort__select:focus {
+    border-color: var(--color-accent);
+    outline: 2px solid transparent;
+
+    box-shadow:
+        0 0 0 3px
+        color-mix(
+            in srgb,
+            var(--color-accent) 25%,
+            transparent
+        );
+}
+
+@media (max-width: 480px) {
+    .saved-card-sort {
+        align-items: stretch;
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .saved-card-sort__select {
+        width: 100%;
+    }
+}
