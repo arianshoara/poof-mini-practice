@@ -824,3 +824,59 @@ h1,
     opacity: 0.55;
     cursor: default;
 }
+
+/* =========================================================
+   SAVED CARD SEARCH
+   ========================================================= */
+
+.saved-card-search {
+    margin: 18px 0;
+}
+
+.saved-card-search__label {
+    display: block;
+
+    margin-bottom: 8px;
+
+    color: var(--color-text);
+    font-size: 14px;
+    font-weight: bold;
+}
+
+.saved-card-search__input {
+    width: 100%;
+    padding: 11px 14px;
+
+    color: var(--color-text);
+    background-color: var(--color-surface);
+
+    border: 1px solid var(--color-border);
+    border-radius: 12px;
+
+    font: inherit;
+}
+
+.saved-card-search__input::placeholder {
+    color: var(--color-text-muted);
+}
+
+.saved-card-search__input:hover {
+    border-color: var(--color-accent);
+}
+
+.saved-card-search__input:focus {
+    border-color: var(--color-accent);
+    outline: 2px solid transparent;
+
+    box-shadow:
+        0 0 0 3px
+        color-mix(
+            in srgb,
+            var(--color-accent) 25%,
+            transparent
+        );
+}
+
+.saved-card-search__input::-webkit-search-cancel-button {
+    cursor: pointer;
+}
