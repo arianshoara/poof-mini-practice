@@ -50,6 +50,35 @@ function readCardStorage() {
     }
 }
 
+function writeCardStorage(storageData) {
+    if (!isValidCardStorage(storageData)) {
+        console.error(
+            "Card storage cannot be written because its structure is invalid."
+        );
+
+        return false;
+    }
+
+    try {
+        const serializedValue =
+            JSON.stringify(storageData);
+
+        localStorage.setItem(
+            CARD_STORAGE_KEY,
+            serializedValue
+        );
+
+        return true;
+    } catch (error) {
+        console.error(
+            "Failed to write card storage:",
+            error
+        );
+
+        return false;
+    }
+}
+
 function getCards() {
     const storageData = readCardStorage();
 
