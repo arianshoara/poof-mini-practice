@@ -31,6 +31,13 @@ const confirmDeleteCardButton =
 
 let pendingDeleteCardId = null;
 
+const savedCardSearchInput =
+    document.getElementById(
+        "saved-card-search-input"
+    );
+
+let savedCardSearchQuery = "";
+
 function getStoredCards() {
     const result =
         window.poofStorage.getCards();
@@ -174,6 +181,29 @@ function createSavedCardElement(card) {
     return article;
 }
 
+function normalizeSearchText(value) {
+    return String(value || "")
+        .trim()
+        .toLocaleLowerCase();
+}
+
+function cardMatchesSearch(card, query) {
+    if (!query) {
+        return true;
+    }
+
+    const searchableText =
+        normalizeSearchText(
+            [
+                card.word,
+                card.meaning,
+                card.example
+            ].join(" ")
+        );
+
+    return searchableText.includes(query);
+}
+
 function renderSavedCards() {
     const cards = getStoredCards();
 
@@ -196,10 +226,35 @@ function renderSavedCards() {
         return;
     }
 
+    const visibleCards =
+        cards.filter((card) =>
+            cardMatchesSearch(
+                card,
+                savedCardSearchQuery
+            )
+        );
+
+    if (visibleCards.length === 0) {
+        const noResultsMessage =
+            document.createElement("p");
+
+        noResultsMessage.className =
+            "saved-card-list__empty";
+
+        noResultsMessage.textContent =
+            "No cards match your search.";
+
+        savedCardList.replaceChildren(
+            noResultsMessage
+        );
+
+        return;
+    }
+
     const cardFragment =
         document.createDocumentFragment();
 
-    cards.forEach((card) => {
+    visibleCards.forEach((card) => {
         const cardElement =
             createSavedCardElement(card);
 
@@ -348,9 +403,23 @@ function handleSavedCardListClick(event) {
     }
 }
 
+function handleSavedCardSearch(event) {
+    savedCardSearchQuery =
+        normalizeSearchText(
+            event.target.value
+        );
+
+    renderSavedCards();
+}
+
 savedCardList.addEventListener(
     "click",
     handleSavedCardListClick
+);
+
+savedCardSearchInput.addEventListener(
+    "input",
+    handleSavedCardSearch
 );
 
 window.addEventListener(
@@ -372,5 +441,6 @@ deleteCardDialog.addEventListener(
     "close",
     resetDeleteCardDialog
 );
+
 
 renderSavedCards();
