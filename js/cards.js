@@ -78,6 +78,36 @@ function createSavedCardElement(card) {
         article.append(example);
     }
 
+    const actions =
+    document.createElement("div");
+
+        actions.className =
+            "saved-card__actions";
+        
+        const deleteButton =
+            document.createElement("button");
+        
+        deleteButton.type = "button";
+        deleteButton.className =
+            "saved-card__delete";
+        
+        deleteButton.dataset.action =
+            "delete-card";
+        
+        deleteButton.dataset.cardId =
+            card.id;
+        
+        deleteButton.textContent =
+            "Delete";
+        
+        deleteButton.setAttribute(
+            "aria-label",
+            "Delete card " + card.word
+        );
+        
+        actions.append(deleteButton);
+        article.append(actions);
+
     return article;
 }
 
@@ -117,6 +147,54 @@ function renderSavedCards() {
         cardFragment
     );
 }
+
+function handleSavedCardListClick(event) {
+    const deleteButton =
+        event.target.closest(
+            '[data-action="delete-card"]'
+        );
+
+    if (!deleteButton) {
+        return;
+    }
+
+    const cardId =
+        deleteButton.dataset.cardId;
+
+    if (!cardId) {
+        return;
+    }
+
+    const shouldDelete =
+        window.confirm(
+            "Are you sure you want to delete this card?"
+        );
+
+    if (!shouldDelete) {
+        return;
+    }
+
+    const result =
+        window.poofStorage.deleteCard(cardId);
+
+    if (!result.success) {
+        window.alert(
+            result.error ||
+                "The card could not be deleted."
+        );
+
+        return;
+    }
+
+    window.dispatchEvent(
+        new CustomEvent("poof:cards-changed")
+    );
+}
+
+savedCardList.addEventListener(
+    "click",
+    handleSavedCardListClick
+);
 
 window.addEventListener(
     "poof:cards-changed",
