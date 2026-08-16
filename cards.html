@@ -7,6 +7,8 @@
   <link rel="stylesheet" href="css/themes.css">
   <link rel="stylesheet" href="css/main.css">
   <script src="js/navigation.js" defer></script>
+  <script src="js/storage.js" defer></script>
+  <script src="js/cards.js" defer></script>
   <title>POOF Mini Practice | Cards</title>
 </head>
 
@@ -21,6 +23,20 @@
   <main>
     <h2>Cards</h2>
     <p>Your saved vocabulary cards will appear here.</p>
+
+      <section
+      class="cards-summary"
+      aria-labelledby="cards-summary-title"
+      >
+        <h3 id="cards-summary-title">
+            Saved cards
+        </h3>
+  
+        <p id="card-count" aria-live="polite">
+            Loading saved cards...
+        </p>
+      </section>
+    
   </main>
 </body>
 </html>
