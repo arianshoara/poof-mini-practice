@@ -1,8 +1,5 @@
 const lessonList = document.getElementById("lesson-list");
 
-const testState =
-    new URLSearchParams(window.location.search).get("state");
-
 function showMessage(message, state) {
     const messageElement = document.createElement("p");
 
@@ -98,21 +95,8 @@ function renderLessons(lessons) {
 
 async function loadLessons() {
     try {
-        if (testState === "loading") {
-            return;
-        }
-
-        if (testState === "empty") {
-            renderLessons([]);
-            return;
-        }
-
-        const lessonDataPath =
-            testState === "error"
-                ? "data/missing-lessons.json"
-                : "data/lessons.json";
-
-        const response = await fetch(lessonDataPath);
+        const response =
+            await fetch("data/lessons.json");
 
         if (!response.ok) {
             throw new Error(
@@ -127,6 +111,7 @@ async function loadLessons() {
                 "Lesson data must be an array."
             );
         }
+
         renderLessons(lessons);
     } catch (error) {
         showMessage(
