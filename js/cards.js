@@ -20,4 +20,9 @@ function renderCardCount() {
         createCardCountMessage(cards.length);
 }
 
+window.addEventListener(
+    "poof:cards-changed",
+    renderCardCount
+);
+
 renderCardCount();
