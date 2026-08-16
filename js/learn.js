@@ -67,6 +67,36 @@ function createLessonCard(lesson) {
     return card;
 }
 
+function isValidLesson(lesson) {
+    return (
+        lesson !== null &&
+        typeof lesson === "object" &&
+
+        typeof lesson.id === "string" &&
+        lesson.id.trim() !== "" &&
+
+        Number.isInteger(lesson.order) &&
+        lesson.order > 0 &&
+
+        typeof lesson.title === "string" &&
+        lesson.title.trim() !== "" &&
+
+        typeof lesson.description === "string" &&
+        lesson.description.trim() !== "" &&
+
+        typeof lesson.level === "string" &&
+        lesson.level.trim() !== "" &&
+
+        Number.isFinite(lesson.estimated_minutes) &&
+        lesson.estimated_minutes > 0 &&
+
+        (
+            lesson.status === "available" ||
+            lesson.status === "coming_soon"
+        )
+    );
+}
+
 function renderLessons(lessons) {
     if (lessons.length === 0) {
         showMessage(
@@ -104,11 +134,22 @@ async function loadLessons() {
             );
         }
 
+
         const lessons = await response.json();
 
         if (!Array.isArray(lessons)) {
             throw new Error(
                 "Lesson data must be an array."
+            );
+        }
+
+        const hasInvalidLesson = lessons.some(
+            (lesson) => !isValidLesson(lesson)
+        );
+        
+        if (hasInvalidLesson) {
+            throw new Error(
+                "One or more lessons have invalid data."
             );
         }
 
