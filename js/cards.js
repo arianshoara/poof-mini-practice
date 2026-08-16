@@ -36,7 +36,16 @@ const savedCardSearchInput =
         "saved-card-search-input"
     );
 
+const savedCardSortSelect =
+    document.getElementById(
+        "saved-card-sort-select"
+    );
+
+let pendingDeleteCardId = null;
 let savedCardSearchQuery = "";
+let savedCardSortMode = "newest";
+
+
 
 function getStoredCards() {
     const result =
@@ -204,6 +213,32 @@ function cardMatchesSearch(card, query) {
     return searchableText.includes(query);
 }
 
+function sortSavedCards(cards, sortMode) {
+    const sortedCards = [...cards];
+
+    if (sortMode === "oldest") {
+        return sortedCards;
+    }
+
+    if (sortMode === "alphabetical") {
+        return sortedCards.sort(
+            (firstCard, secondCard) =>
+                String(firstCard.word || "")
+                    .localeCompare(
+                        String(
+                            secondCard.word || ""
+                        ),
+                        "de",
+                        {
+                            sensitivity: "base"
+                        }
+                    )
+        );
+    }
+
+    return sortedCards.reverse();
+}
+
 function renderSavedCards() {
     const cards = getStoredCards();
 
@@ -226,13 +261,19 @@ function renderSavedCards() {
         return;
     }
 
-    const visibleCards =
-        cards.filter((card) =>
-            cardMatchesSearch(
-                card,
-                savedCardSearchQuery
-            )
-        );
+    const matchingCards =
+            cards.filter((card) =>
+                cardMatchesSearch(
+                    card,
+                    savedCardSearchQuery
+                )
+            );
+        
+     const visibleCards =
+            sortSavedCards(
+                matchingCards,
+                savedCardSortMode
+            );
 
     if (visibleCards.length === 0) {
         const noResultsMessage =
@@ -412,15 +453,18 @@ function handleSavedCardSearch(event) {
     renderSavedCards();
 }
 
+function handleSavedCardSort(event) {
+    savedCardSortMode =
+        event.target.value;
+
+    renderSavedCards();
+}
+
 savedCardList.addEventListener(
     "click",
     handleSavedCardListClick
 );
 
-savedCardSearchInput.addEventListener(
-    "input",
-    handleSavedCardSearch
-);
 
 window.addEventListener(
     "poof:cards-changed",
@@ -440,6 +484,16 @@ confirmDeleteCardButton.addEventListener(
 deleteCardDialog.addEventListener(
     "close",
     resetDeleteCardDialog
+);
+
+savedCardSearchInput.addEventListener(
+    "input",
+    handleSavedCardSearch
+);
+
+savedCardSortSelect.addEventListener(
+    "change",
+    handleSavedCardSort
 );
 
 
