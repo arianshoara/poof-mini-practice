@@ -105,11 +105,35 @@ function createSavedCardElement(card) {
             "Delete card " + card.word
         );
         
-        actions.append(deleteButton);
+        actions.append(
+            editButton,
+            deleteButton
+        );
         article.append(actions);
 
     return article;
 }
+
+const editButton =
+    document.createElement("button");
+
+editButton.type = "button";
+editButton.className =
+    "saved-card__edit";
+
+editButton.dataset.action =
+    "edit-card";
+
+editButton.dataset.cardId =
+    card.id;
+
+editButton.textContent =
+    "Edit";
+
+editButton.setAttribute(
+    "aria-label",
+    "Edit card " + card.word
+);
 
 function renderSavedCards() {
     const cards = getStoredCards();
@@ -149,19 +173,55 @@ function renderSavedCards() {
 }
 
 function handleSavedCardListClick(event) {
-    const deleteButton =
+    const actionButton =
         event.target.closest(
-            '[data-action="delete-card"]'
+            "[data-action]"
         );
 
-    if (!deleteButton) {
+    if (
+        !actionButton ||
+        !savedCardList.contains(actionButton)
+    ) {
         return;
     }
 
+    const action =
+        actionButton.dataset.action;
+
     const cardId =
-        deleteButton.dataset.cardId;
+        actionButton.dataset.cardId;
 
     if (!cardId) {
+        return;
+    }
+
+    if (action === "edit-card") {
+        const cards = getStoredCards();
+
+        const selectedCard =
+            cards.find(
+                (card) => card.id === cardId
+            );
+
+        if (!selectedCard) {
+            return;
+        }
+
+        window.dispatchEvent(
+            new CustomEvent(
+                "poof:edit-card",
+                {
+                    detail: {
+                        card: selectedCard
+                    }
+                }
+            )
+        );
+
+        return;
+    }
+
+    if (action !== "delete-card") {
         return;
     }
 
