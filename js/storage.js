@@ -50,6 +50,20 @@ function isOptionalReference(value) {
     );
 }
 
+function isValidIsoDate(value) {
+    if (typeof value !== "string") {
+        return false;
+    }
+
+    const parsedDate = new Date(value);
+
+    if (Number.isNaN(parsedDate.getTime())) {
+        return false;
+    }
+
+    return parsedDate.toISOString() === value;
+}
+
 function isValidCardInput(cardInput) {
     if (
         cardInput === null ||
@@ -87,6 +101,62 @@ function isValidCardInput(cardInput) {
             cardInput.source_text === null ||
             typeof cardInput.source_text === "string"
         )
+    );
+}
+
+function isValidStoredCard(card) {
+    if (
+        card === null ||
+        typeof card !== "object" ||
+        Array.isArray(card)
+    ) {
+        return false;
+    }
+
+    const hasValidDictionaryReference =
+        card.dictionary_entry_id === null ||
+        isNonEmptyString(
+            card.dictionary_entry_id
+        );
+
+    const hasValidSourceId =
+        card.source_id === null ||
+        isNonEmptyString(card.source_id);
+
+    const hasValidSourceText =
+        card.source_text === null ||
+        typeof card.source_text === "string";
+
+    const hasValidSourceType =
+        ALLOWED_CARD_SOURCE_TYPES.includes(
+            card.source_type
+        );
+
+    const hasValidDates =
+        isValidIsoDate(card.created_at) &&
+        isValidIsoDate(card.updated_at);
+
+    if (!hasValidDates) {
+        return false;
+    }
+
+    const creationTime =
+        new Date(card.created_at).getTime();
+
+    const updateTime =
+        new Date(card.updated_at).getTime();
+
+    return (
+        isNonEmptyString(card.id) &&
+        hasValidDictionaryReference &&
+        isNonEmptyString(card.word) &&
+        isNonEmptyString(card.meaning) &&
+        typeof card.example === "string" &&
+        isNonEmptyString(card.deck_id) &&
+        hasValidSourceType &&
+        hasValidSourceId &&
+        hasValidSourceText &&
+        updateTime >= creationTime
     );
 }
 
@@ -154,12 +224,43 @@ function createStoredCard(cardInput) {
 }
 
 function isValidCardStorage(storageData) {
+    if (
+        storageData === null ||
+        typeof storageData !== "object" ||
+        Array.isArray(storageData)
+    ) {
+        return false;
+    }
+
+    if (
+        storageData.schema_version !==
+        CARD_SCHEMA_VERSION
+    ) {
+        return false;
+    }
+
+    if (!Array.isArray(storageData.cards)) {
+        return false;
+    }
+
+    const allCardsAreValid =
+        storageData.cards.every(
+            (card) => isValidStoredCard(card)
+        );
+
+    if (!allCardsAreValid) {
+        return false;
+    }
+
+    const cardIds = storageData.cards.map(
+        (card) => card.id
+    );
+
+    const uniqueCardIds =
+        new Set(cardIds);
+
     return (
-        storageData !== null &&
-        typeof storageData === "object" &&
-        storageData.schema_version ===
-            CARD_SCHEMA_VERSION &&
-        Array.isArray(storageData.cards)
+        uniqueCardIds.size === cardIds.length
     );
 }
 
