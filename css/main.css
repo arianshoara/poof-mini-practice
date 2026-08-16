@@ -617,3 +617,40 @@ h1,
             repeat(2, minmax(0, 1fr));
     }
 }
+
+.saved-card__actions {
+    display: flex;
+    justify-content: flex-end;
+
+    padding-top: 4px;
+}
+
+.saved-card__delete {
+    padding: 7px 12px;
+
+    color: var(--color-error);
+    background-color: transparent;
+
+    border: 1px solid var(--color-error);
+    border-radius: 10px;
+
+    font: inherit;
+    font-size: 13px;
+    font-weight: bold;
+
+    cursor: pointer;
+}
+
+.saved-card__delete:hover {
+    color: var(--color-background);
+    background-color: var(--color-error);
+}
+
+.saved-card__delete:active {
+    transform: scale(0.96);
+}
+
+.saved-card__delete:focus-visible {
+    outline: 2px solid var(--color-error);
+    outline-offset: 3px;
+}
