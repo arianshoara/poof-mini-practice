@@ -4,6 +4,11 @@ const cardCountElement =
 const addSampleCardButton =
     document.getElementById("add-sample-card");
 
+const deleteSampleCardButton =
+    document.getElementById(
+        "delete-sample-card"
+    );
+
 const cardStorageResult =
     document.getElementById(
         "card-storage-result"
@@ -38,7 +43,7 @@ function getSampleCard() {
     );
 }
 
-function updateSampleCardButton() {
+function updateSampleCardButtons() {
     const sampleCard = getSampleCard();
 
     if (sampleCard) {
@@ -46,12 +51,16 @@ function updateSampleCardButton() {
         addSampleCardButton.textContent =
             "Sample card saved";
 
+        deleteSampleCardButton.disabled = false;
+
         return;
     }
 
     addSampleCardButton.disabled = false;
     addSampleCardButton.textContent =
         "Save sample card";
+
+    deleteSampleCardButton.disabled = true;
 }
 
 function handleAddSampleCard() {
@@ -79,7 +88,36 @@ function handleAddSampleCard() {
         "The sample card was saved successfully.";
 
     renderCardCount();
-    updateSampleCardButton();
+    updateSampleCardButtons();
+}
+
+function handleDeleteSampleCard() {
+    const sampleCard = getSampleCard();
+
+    if (!sampleCard) {
+        cardStorageResult.textContent =
+            "The sample card was not found.";
+
+        updateSampleCardButtons();
+
+        return;
+    }
+
+    const result =
+        poofStorage.deleteCard(sampleCard.id);
+
+    if (!result.success) {
+        cardStorageResult.textContent =
+            "The sample card could not be deleted.";
+
+        return;
+    }
+
+    cardStorageResult.textContent =
+        "The sample card was deleted successfully.";
+
+    renderCardCount();
+    updateSampleCardButtons();
 }
 
 addSampleCardButton.addEventListener(
@@ -87,5 +125,11 @@ addSampleCardButton.addEventListener(
     handleAddSampleCard
 );
 
+deleteSampleCardButton.addEventListener(
+    "click",
+    handleDeleteSampleCard
+);
+
+
 renderCardCount();
-updateSampleCardButton();
+updateSampleCardButtons();
