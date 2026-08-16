@@ -9,6 +9,18 @@ const cardBuilderSubmit =
         ".card-builder__submit"
     );
 
+const cardBuilderTitle =
+    document.getElementById(
+        "card-builder-title"
+    );
+
+const cardBuilderCancel =
+    document.getElementById(
+        "card-builder-cancel"
+    );
+
+let editingCardId = null;
+
 function showCardBuilderMessage(message, state) {
     cardBuilderMessage.textContent = message;
     cardBuilderMessage.className =
@@ -46,6 +58,94 @@ function createCardInput(form) {
     };
 }
 
+function setFormFieldValue(fieldName, value) {
+    const field =
+        cardBuilderForm.elements.namedItem(
+            fieldName
+        );
+
+    if (!field) {
+        return;
+    }
+
+    field.value = value || "";
+}
+
+function resetCardBuilderMode() {
+    editingCardId = null;
+
+    cardBuilderForm.reset();
+
+    cardBuilderTitle.textContent =
+        "Create a card";
+
+    cardBuilderSubmit.textContent =
+        "Save card";
+
+    cardBuilderCancel.hidden = true;
+}
+
+function startEditingCard(event) {
+    const card = event.detail.card;
+
+    if (!card) {
+        return;
+    }
+
+    editingCardId = card.id;
+
+    setFormFieldValue(
+        "word",
+        card.word
+    );
+
+    setFormFieldValue(
+        "meaning",
+        card.meaning
+    );
+
+    setFormFieldValue(
+        "example",
+        card.example
+    );
+
+    setFormFieldValue(
+        "deck_id",
+        card.deck_id
+    );
+
+    cardBuilderTitle.textContent =
+        "Edit card";
+
+    cardBuilderSubmit.textContent =
+        "Save changes";
+
+    cardBuilderCancel.hidden = false;
+
+    showCardBuilderMessage(
+        "You are editing " + card.word + ".",
+        null
+    );
+
+    cardBuilderForm.scrollIntoView({
+        behavior: "smooth",
+        block: "center"
+    });
+
+    document
+        .getElementById("card-word")
+        .focus();
+}
+
+function cancelCardEditing() {
+    resetCardBuilderMode();
+
+    showCardBuilderMessage(
+        "Editing was cancelled.",
+        null
+    );
+}
+
 function handleCardBuilderSubmit(event) {
     event.preventDefault();
 
@@ -61,8 +161,25 @@ function handleCardBuilderSubmit(event) {
 
     cardBuilderSubmit.disabled = true;
 
-    const result =
-        window.poofStorage.addCard(cardInput);
+    let result;
+
+    if (editingCardId) {
+        result =
+            window.poofStorage.updateCard(
+                editingCardId,
+                {
+                    word: cardInput.word,
+                    meaning: cardInput.meaning,
+                    example: cardInput.example,
+                    deck_id: cardInput.deck_id
+                }
+            );
+    } else {
+        result =
+            window.poofStorage.addCard(
+                cardInput
+            );
+    }
 
     cardBuilderSubmit.disabled = false;
 
@@ -76,10 +193,15 @@ function handleCardBuilderSubmit(event) {
         return;
     }
 
-    cardBuilderForm.reset();
+    const wasEditing =
+        editingCardId !== null;
+
+    resetCardBuilderMode();
 
     showCardBuilderMessage(
-        "The card was saved successfully.",
+        wasEditing
+            ? "The card was updated successfully."
+            : "The card was saved successfully.",
         "success"
     );
 
@@ -95,4 +217,14 @@ function handleCardBuilderSubmit(event) {
 cardBuilderForm.addEventListener(
     "submit",
     handleCardBuilderSubmit
+);
+
+window.addEventListener(
+    "poof:edit-card",
+    startEditingCard
+);
+
+cardBuilderCancel.addEventListener(
+    "click",
+    cancelCardEditing
 );
