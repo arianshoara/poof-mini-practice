@@ -10,6 +10,17 @@ const ALLOWED_CARD_SOURCE_TYPES = [
     "story"
 ];
 
+const EDITABLE_CARD_FIELDS = [
+    "dictionary_entry_id",
+    "word",
+    "meaning",
+    "example",
+    "deck_id",
+    "source_type",
+    "source_id",
+    "source_text"
+];
+
 function createEmptyCardStorage() {
     return {
         schema_version: CARD_SCHEMA_VERSION,
@@ -273,6 +284,132 @@ function addCard(cardInput) {
     };
 }
 
+function updateCard(cardId, changes) {
+    if (!isNonEmptyString(cardId)) {
+        return {
+            success: false,
+            card: null,
+            error: "Invalid card ID."
+        };
+    }
+
+    if (
+        changes === null ||
+        typeof changes !== "object" ||
+        Array.isArray(changes)
+    ) {
+        return {
+            success: false,
+            card: null,
+            error: "Invalid card changes."
+        };
+    }
+
+    const hasEditableChange =
+        EDITABLE_CARD_FIELDS.some(
+            (fieldName) =>
+                changes[fieldName] !== undefined
+        );
+
+    if (!hasEditableChange) {
+        return {
+            success: false,
+            card: null,
+            error: "No editable changes were provided."
+        };
+    }
+
+    const storageData = readCardStorage();
+
+    const cardIndex = storageData.cards.findIndex(
+        (card) => card.id === cardId
+    );
+
+    if (cardIndex === -1) {
+        return {
+            success: false,
+            card: null,
+            error: "Card not found."
+        };
+    }
+
+    const currentCard =
+        storageData.cards[cardIndex];
+
+    const updatedCard = {
+        ...currentCard
+    };
+
+    EDITABLE_CARD_FIELDS.forEach(
+        (fieldName) => {
+            if (
+                changes[fieldName] !== undefined
+            ) {
+                updatedCard[fieldName] =
+                    changes[fieldName];
+            }
+        }
+    );
+
+    if (!isValidCardInput(updatedCard)) {
+        return {
+            success: false,
+            card: null,
+            error: "Updated card data is invalid."
+        };
+    }
+
+    updatedCard.word =
+        updatedCard.word.trim();
+
+    updatedCard.meaning =
+        updatedCard.meaning.trim();
+
+    updatedCard.example =
+        updatedCard.example.trim();
+
+    updatedCard.deck_id =
+        updatedCard.deck_id.trim();
+
+    if (
+        typeof updatedCard.dictionary_entry_id ===
+        "string"
+    ) {
+        updatedCard.dictionary_entry_id =
+            updatedCard.dictionary_entry_id.trim();
+    }
+
+    if (
+        typeof updatedCard.source_id === "string"
+    ) {
+        updatedCard.source_id =
+            updatedCard.source_id.trim();
+    }
+
+    updatedCard.updated_at =
+        new Date().toISOString();
+
+    storageData.cards[cardIndex] =
+        updatedCard;
+
+    const wasSaved =
+        writeCardStorage(storageData);
+
+    if (!wasSaved) {
+        return {
+            success: false,
+            card: null,
+            error: "Card update could not be saved."
+        };
+    }
+
+    return {
+        success: true,
+        card: updatedCard,
+        error: null
+    };
+}
+
 function deleteCard(cardId) {
     if (!isNonEmptyString(cardId)) {
         console.error(
@@ -327,5 +464,6 @@ window.poofStorage = {
     getCards,
     getCardById,
     addCard,
+    updateCard,
     deleteCard
 };
