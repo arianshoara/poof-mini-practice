@@ -29,8 +29,6 @@ const confirmDeleteCardButton =
         "confirm-delete-card"
     );
 
-let pendingDeleteCardId = null;
-
 const savedCardSearchInput =
     document.getElementById(
         "saved-card-search-input"
