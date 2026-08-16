@@ -376,3 +376,269 @@ The Learn page should continue to receive lesson objects through a defined data 
 Personal user data, such as lesson progress or completion status, must not be stored inside the shared lesson catalog.
 
 That information will require a separate storage layer and, later, a user-specific database model.
+
+---
+
+## Decision 005 — Access Personal Card Data Through One Storage Layer
+
+**Status:** Accepted  
+**Date:** 2026-08-16
+
+### Context
+
+POOF Mini Practice needs to store personal vocabulary cards.
+
+The current project does not have:
+
+- A backend
+- A database
+- Authentication
+- User accounts
+- Cross-device synchronization
+
+Browser localStorage is sufficient for the current learning milestone.
+
+However, allowing every page to access localStorage directly would tightly connect the application interface to one storage technology.
+
+For example, Cards, Dictionary, Library, and Learn could each begin using their own storage keys, JSON structures, validation rules, and error handling.
+
+That duplication would make the future transition to Supabase or a backend difficult.
+
+### Decision
+
+All personal card storage operations will be handled by one shared file:
+
+`js/storage.js`
+
+Other project files must not directly call:
+
+- `localStorage.getItem()`
+- `localStorage.setItem()`
+- `localStorage.removeItem()`
+
+Pages must use the public storage interface instead.
+
+The current public interface is available through:
+
+`window.poofStorage`
+
+It provides these operations:
+
+- `getCards()`
+- `getCardById(cardId)`
+- `addCard(cardInput)`
+- `updateCard(cardId, changes)`
+- `deleteCard(cardId)`
+
+### Storage Key
+
+Personal card data is stored using one localStorage key:
+
+`poof-mini-card-storage`
+
+The key is defined only inside `js/storage.js`.
+
+Other files must not depend on the key name.
+
+### Storage Envelope
+
+Stored card data uses this top-level structure:
+
+{
+  "schema_version": 1,
+  "cards": []
+}
+
+The top-level object contains:
+
+- A storage schema version
+- An array of personal cards
+
+The schema version is used to identify the structure of the stored data.
+
+Future structural changes may require migrations from one schema version to another.
+
+### Card Creation
+
+The storage layer is responsible for creating the final stored card.
+
+A card input may initially contain only the required learning information, such as:
+
+- `word`
+- `meaning`
+
+The storage layer adds or normalizes:
+
+- A unique card identifier
+- Default deck information
+- Default source information
+- Creation time
+- Update time
+- Optional dictionary references
+- Optional source context
+
+Card identifiers are generated inside the storage layer.
+
+Pages must not manually create or control stored card identifiers.
+
+### Card Identity
+
+The following values must remain stable:
+
+- `id`
+- `created_at`
+
+Editing a card must not create a new identity for it.
+
+The `updateCard()` operation may change editable learning fields but must preserve the original card identifier and creation time.
+
+The `updated_at` value changes when an update is successfully stored.
+
+### Validation
+
+Card data is validated at multiple boundaries.
+
+Before adding a card:
+
+- Required input fields are checked.
+- Supported source types are checked.
+- Optional references are checked.
+
+Before writing Storage:
+
+- The top-level structure is checked.
+- The schema version is checked.
+- The cards value must be an array.
+
+When reading Storage:
+
+- Every stored card is validated.
+- Required card fields are checked.
+- Date values are checked.
+- Card identifiers must be unique.
+- The update date must not be earlier than the creation date.
+
+Invalid data must not be silently treated as valid application data.
+
+### Error Handling
+
+Storage operations must not crash the entire page.
+
+Read and write operations use error handling for situations such as:
+
+- Invalid JSON
+- Invalid Storage structure
+- Unsupported Schema version
+- Invalid card input
+- Missing cards
+- Browser Storage restrictions
+- Failed writes
+
+Storage mutations return a result object containing:
+
+- `success`
+- `card`
+- `error`
+
+This allows the interface to display a useful message without needing direct knowledge of the internal Storage implementation.
+
+Read operations return safe values:
+
+- `getCards()` returns an array.
+- `getCardById()` returns a card or `null`.
+
+### Separation of Shared and Personal Data
+
+Personal cards must remain separate from shared dictionary data.
+
+Shared dictionary information represents general language knowledge.
+
+Personal cards represent:
+
+- A user-selected word
+- A selected meaning
+- A personal example
+- A source
+- Learning context
+- Personal organization
+
+A card may contain `dictionary_entry_id` as a reference to a shared dictionary entry.
+
+Creating, editing, or deleting a personal card must not modify shared dictionary data.
+
+### Current Consumer
+
+The Cards page currently uses:
+
+`poofStorage.getCards()`
+
+The page displays the number of stored cards without directly accessing localStorage.
+
+The temporary controls used to test adding and deleting cards were removed after the storage flow was verified.
+
+The underlying Storage operations remain available for the real Card Builder.
+
+### Consequences
+
+Positive consequences:
+
+- Storage rules have one source of truth.
+- Pages remain independent from localStorage details.
+- Card validation is shared.
+- Storage keys are not duplicated across files.
+- Error handling is centralized.
+- Card identity is controlled consistently.
+- A future Storage implementation can preserve the same public operations.
+- Card Builder, Dictionary, Library, and Learn can reuse the same layer.
+
+Trade-offs:
+
+- `storage.js` contains more logic than a direct localStorage call.
+- All consumers depend on the public Storage contract.
+- Changes to the public operations may affect multiple features.
+- localStorage operations are synchronous.
+- The current implementation uses a global `window.poofStorage` object.
+- Automated tests have not yet been introduced.
+
+### Current Limitations
+
+The current Storage implementation:
+
+- Belongs to one browser and device
+- Does not synchronize between browsers
+- Does not synchronize between devices
+- Has no authenticated user owner
+- Can be cleared by the browser or user
+- Is not suitable for secrets
+- Is not a production database
+- Does not currently perform Schema migrations
+- Does not provide automatic backup or recovery
+
+Passwords, API keys, access tokens, and other secrets must never be stored through this layer.
+
+### Future Impact
+
+A future version may replace localStorage with:
+
+- Supabase
+- PostgreSQL
+- A backend API
+- Another persistent Storage provider
+
+The implementation behind the public interface may change, but pages should continue using operations such as:
+
+- `getCards()`
+- `addCard()`
+- `updateCard()`
+- `deleteCard()`
+
+This decision creates the first Storage Adapter boundary in POOF Mini Practice.
+
+The same architectural principle can later be applied to:
+
+- Lesson progress
+- Theme preferences
+- Decks
+- Review history
+- Library progress
+- User settings
