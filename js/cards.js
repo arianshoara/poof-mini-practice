@@ -4,6 +4,33 @@ const savedCardsCount =
 const savedCardList =
     document.getElementById("saved-card-list");
 
+const deleteCardDialog =
+    document.getElementById(
+        "delete-card-dialog"
+    );
+
+const deleteCardDialogMessage =
+    document.getElementById(
+        "delete-card-dialog-message"
+    );
+
+const deleteCardDialogError =
+    document.getElementById(
+        "delete-card-dialog-error"
+    );
+
+const cancelDeleteCardButton =
+    document.getElementById(
+        "cancel-delete-card"
+    );
+
+const confirmDeleteCardButton =
+    document.getElementById(
+        "confirm-delete-card"
+    );
+
+let pendingDeleteCardId = null;
+
 function getStoredCards() {
     const result =
         window.poofStorage.getCards();
@@ -186,6 +213,84 @@ function renderSavedCards() {
     );
 }
 
+function openDeleteCardDialog(cardId) {
+    const cards = getStoredCards();
+
+    const selectedCard =
+        cards.find(
+            (card) => card.id === cardId
+        );
+
+    if (!selectedCard) {
+        return;
+    }
+
+    pendingDeleteCardId =
+        selectedCard.id;
+
+    deleteCardDialogMessage.textContent =
+        'Delete "' +
+        selectedCard.word +
+        '"? This action cannot be undone.';
+
+    deleteCardDialogError.textContent =
+        "";
+
+    deleteCardDialog.showModal();
+
+    cancelDeleteCardButton.focus();
+}
+
+function closeDeleteCardDialog() {
+    deleteCardDialog.close();
+}
+
+function confirmCardDeletion() {
+    if (!pendingDeleteCardId) {
+        return;
+    }
+
+    confirmDeleteCardButton.disabled =
+        true;
+
+    const result =
+        window.poofStorage.deleteCard(
+            pendingDeleteCardId
+        );
+
+    confirmDeleteCardButton.disabled =
+        false;
+
+    if (!result.success) {
+        deleteCardDialogError.textContent =
+            result.error ||
+            "The card could not be deleted.";
+
+        return;
+    }
+
+    deleteCardDialog.close();
+
+    window.dispatchEvent(
+        new CustomEvent(
+            "poof:cards-changed"
+        )
+    );
+}
+
+function resetDeleteCardDialog() {
+    pendingDeleteCardId = null;
+
+    deleteCardDialogMessage.textContent =
+        "Are you sure you want to delete this card?";
+
+    deleteCardDialogError.textContent =
+        "";
+
+    confirmDeleteCardButton.disabled =
+        false;
+}
+
 function handleSavedCardListClick(event) {
     const actionButton =
         event.target.closest(
@@ -238,38 +343,9 @@ function handleSavedCardListClick(event) {
         return;
     }
 
-    if (action !== "delete-card") {
-        return;
+        if (action === "delete-card") {
+        openDeleteCardDialog(cardId);
     }
-
-    const shouldDelete =
-        window.confirm(
-            "Are you sure you want to delete this card?"
-        );
-
-    if (!shouldDelete) {
-        return;
-    }
-
-    const result =
-        window.poofStorage.deleteCard(
-            cardId
-        );
-
-    if (!result.success) {
-        window.alert(
-            result.error ||
-                "The card could not be deleted."
-        );
-
-        return;
-    }
-
-    window.dispatchEvent(
-        new CustomEvent(
-            "poof:cards-changed"
-        )
-    );
 }
 
 savedCardList.addEventListener(
@@ -280,6 +356,21 @@ savedCardList.addEventListener(
 window.addEventListener(
     "poof:cards-changed",
     renderSavedCards
+);
+
+cancelDeleteCardButton.addEventListener(
+    "click",
+    closeDeleteCardDialog
+);
+
+confirmDeleteCardButton.addEventListener(
+    "click",
+    confirmCardDeletion
+);
+
+deleteCardDialog.addEventListener(
+    "close",
+    resetDeleteCardDialog
 );
 
 renderSavedCards();
