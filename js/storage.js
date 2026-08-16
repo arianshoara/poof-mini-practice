@@ -79,6 +79,69 @@ function isValidCardInput(cardInput) {
     );
 }
 
+function createCardId() {
+    if (
+        typeof crypto !== "undefined" &&
+        typeof crypto.randomUUID === "function"
+    ) {
+        return "card_" + crypto.randomUUID();
+    }
+
+    return (
+        "card_" +
+        Date.now() +
+        "_" +
+        Math.random().toString(16).slice(2)
+    );
+}
+
+function createStoredCard(cardInput) {
+    const currentTime =
+        new Date().toISOString();
+
+    return {
+        id: createCardId(),
+
+        dictionary_entry_id:
+            cardInput.dictionary_entry_id ===
+            undefined
+                ? null
+                : cardInput.dictionary_entry_id,
+
+        word: cardInput.word.trim(),
+
+        meaning: cardInput.meaning.trim(),
+
+        example:
+            cardInput.example === undefined
+                ? ""
+                : cardInput.example.trim(),
+
+        deck_id:
+            cardInput.deck_id === undefined
+                ? "default"
+                : cardInput.deck_id.trim(),
+
+        source_type:
+            cardInput.source_type === undefined
+                ? "manual"
+                : cardInput.source_type,
+
+        source_id:
+            cardInput.source_id === undefined
+                ? null
+                : cardInput.source_id,
+
+        source_text:
+            cardInput.source_text === undefined
+                ? null
+                : cardInput.source_text,
+
+        created_at: currentTime,
+        updated_at: currentTime
+    };
+}
+
 function isValidCardStorage(storageData) {
     return (
         storageData !== null &&
@@ -154,6 +217,45 @@ function getCards() {
     return [...storageData.cards];
 }
 
+function addCard(cardInput) {
+    if (!isValidCardInput(cardInput)) {
+        console.error(
+            "Card could not be added because its input is invalid."
+        );
+
+        return {
+            success: false,
+            card: null,
+            error: "Invalid card input."
+        };
+    }
+
+    const storageData = readCardStorage();
+
+    const newCard =
+        createStoredCard(cardInput);
+
+    storageData.cards.push(newCard);
+
+    const wasSaved =
+        writeCardStorage(storageData);
+
+    if (!wasSaved) {
+        return {
+            success: false,
+            card: null,
+            error: "Card storage failed."
+        };
+    }
+
+    return {
+        success: true,
+        card: newCard,
+        error: null
+    };
+}
+
 window.poofStorage = {
-    getCards
+    getCards,
+    addCard
 };
