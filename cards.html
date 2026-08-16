@@ -24,6 +24,92 @@
     <h2>Cards</h2>
     <p>Your saved vocabulary cards will appear here.</p>
 
+              <section
+            class="card-builder"
+            aria-labelledby="card-builder-title"
+        >
+            <h3 id="card-builder-title">
+                Create a card
+            </h3>
+        
+            <form id="card-builder-form">
+                <div class="card-builder__field">
+                    <label for="card-word">
+                        Word
+                    </label>
+        
+                    <input
+                        id="card-word"
+                        name="word"
+                        type="text"
+                        lang="de"
+                        maxlength="120"
+                        autocomplete="off"
+                        required
+                    >
+                </div>
+        
+                <div class="card-builder__field">
+                    <label for="card-meaning">
+                        Meaning
+                    </label>
+        
+                    <input
+                        id="card-meaning"
+                        name="meaning"
+                        type="text"
+                        dir="auto"
+                        maxlength="200"
+                        autocomplete="off"
+                        required
+                    >
+                </div>
+        
+                <div class="card-builder__field">
+                    <label for="card-example">
+                        Example
+                    </label>
+        
+                    <textarea
+                        id="card-example"
+                        name="example"
+                        lang="de"
+                        dir="auto"
+                        rows="3"
+                        maxlength="400"
+                    ></textarea>
+                </div>
+        
+                <div class="card-builder__field">
+                    <label for="card-deck">
+                        Deck
+                    </label>
+        
+                    <select
+                        id="card-deck"
+                        name="deck_id"
+                    >
+                        <option value="default">
+                            Default deck
+                        </option>
+                    </select>
+                </div>
+        
+                <button
+                    class="card-builder__submit"
+                    type="submit"
+                >
+                    Save card
+                </button>
+        
+                <p
+                    id="card-builder-message"
+                    class="card-builder__message"
+                    aria-live="polite"
+                ></p>
+            </form>
+        </section>
+      
       <section
       class="cards-summary"
       aria-labelledby="cards-summary-title"
