@@ -97,6 +97,19 @@ function isValidLesson(lesson) {
     );
 }
 
+function hasDuplicateLessonValue(
+    lessons,
+    propertyName
+) {
+    const values = lessons.map(
+        (lesson) => lesson[propertyName]
+    );
+
+    const uniqueValues = new Set(values);
+
+    return uniqueValues.size !== values.length;
+}
+
 function renderLessons(lessons) {
     if (lessons.length === 0) {
         showMessage(
@@ -152,13 +165,31 @@ async function loadLessons() {
                 "One or more lessons have invalid data."
             );
         }
+        
+        const hasDuplicateId =
+            hasDuplicateLessonValue(lessons, "id");
+        
+        if (hasDuplicateId) {
+            throw new Error(
+                "Lesson IDs must be unique."
+            );
+        }
+        
+        const hasDuplicateOrder =
+            hasDuplicateLessonValue(lessons, "order");
+        
+        if (hasDuplicateOrder) {
+            throw new Error(
+                "Lesson orders must be unique."
+            );
+        }
 
         renderLessons(lessons);
-    } catch (error) {
-        showMessage(
-            "Lessons could not be loaded.",
-            "error"
-        );
+        } catch (error) {
+            showMessage(
+                "Lessons could not be loaded.",
+                "error"
+            );
 
         console.error(
             "Failed to load lessons:",
