@@ -255,7 +255,58 @@ function addCard(cardInput) {
     };
 }
 
+function deleteCard(cardId) {
+    if (!isNonEmptyString(cardId)) {
+        console.error(
+            "Card could not be deleted because its ID is invalid."
+        );
+
+        return {
+            success: false,
+            card: null,
+            error: "Invalid card ID."
+        };
+    }
+
+    const storageData = readCardStorage();
+
+    const cardIndex = storageData.cards.findIndex(
+        (card) => card.id === cardId
+    );
+
+    if (cardIndex === -1) {
+        return {
+            success: false,
+            card: null,
+            error: "Card not found."
+        };
+    }
+
+    const deletedCards =
+        storageData.cards.splice(cardIndex, 1);
+
+    const deletedCard = deletedCards[0];
+
+    const wasSaved =
+        writeCardStorage(storageData);
+
+    if (!wasSaved) {
+        return {
+            success: false,
+            card: null,
+            error: "Card deletion could not be saved."
+        };
+    }
+
+    return {
+        success: true,
+        card: deletedCard,
+        error: null
+    };
+}
+
 window.poofStorage = {
     getCards,
-    addCard
+    addCard,
+    deleteCard
 };
