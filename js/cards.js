@@ -51,18 +51,25 @@ function createSavedCardElement(card) {
     const word =
         document.createElement("h4");
 
-    word.className = "saved-card__word";
+    word.className =
+        "saved-card__word";
+
     word.textContent = card.word;
     word.lang = "de";
 
     const meaning =
         document.createElement("p");
 
-    meaning.className = "saved-card__meaning";
+    meaning.className =
+        "saved-card__meaning";
+
     meaning.textContent = card.meaning;
     meaning.dir = "auto";
 
-    article.append(word, meaning);
+    article.append(
+        word,
+        meaning
+    );
 
     if (card.example) {
         const example =
@@ -71,7 +78,9 @@ function createSavedCardElement(card) {
         example.className =
             "saved-card__example";
 
-        example.textContent = card.example;
+        example.textContent =
+            card.example;
+
         example.lang = "de";
         example.dir = "auto";
 
@@ -79,61 +88,64 @@ function createSavedCardElement(card) {
     }
 
     const actions =
-    document.createElement("div");
+        document.createElement("div");
 
-        actions.className =
-            "saved-card__actions";
-        
-        const deleteButton =
-            document.createElement("button");
-        
-        deleteButton.type = "button";
-        deleteButton.className =
-            "saved-card__delete";
-        
-        deleteButton.dataset.action =
-            "delete-card";
-        
-        deleteButton.dataset.cardId =
-            card.id;
-        
-        deleteButton.textContent =
-            "Delete";
-        
-        deleteButton.setAttribute(
-            "aria-label",
-            "Delete card " + card.word
-        );
-        
-        actions.append(
-            editButton,
-            deleteButton
-        );
-        article.append(actions);
+    actions.className =
+        "saved-card__actions";
+
+    const editButton =
+        document.createElement("button");
+
+    editButton.type = "button";
+
+    editButton.className =
+        "saved-card__edit";
+
+    editButton.dataset.action =
+        "edit-card";
+
+    editButton.dataset.cardId =
+        card.id;
+
+    editButton.textContent =
+        "Edit";
+
+    editButton.setAttribute(
+        "aria-label",
+        "Edit card " + card.word
+    );
+
+    const deleteButton =
+        document.createElement("button");
+
+    deleteButton.type = "button";
+
+    deleteButton.className =
+        "saved-card__delete";
+
+    deleteButton.dataset.action =
+        "delete-card";
+
+    deleteButton.dataset.cardId =
+        card.id;
+
+    deleteButton.textContent =
+        "Delete";
+
+    deleteButton.setAttribute(
+        "aria-label",
+        "Delete card " + card.word
+    );
+
+    actions.append(
+        editButton,
+        deleteButton
+    );
+
+    article.append(actions);
 
     return article;
 }
-
-const editButton =
-    document.createElement("button");
-
-editButton.type = "button";
-editButton.className =
-    "saved-card__edit";
-
-editButton.dataset.action =
-    "edit-card";
-
-editButton.dataset.cardId =
-    card.id;
-
-editButton.textContent =
-    "Edit";
-
-editButton.setAttribute(
-    "aria-label",
-    "Edit card " + card.word
-);
 
 function renderSavedCards() {
     const cards = getStoredCards();
@@ -164,7 +176,9 @@ function renderSavedCards() {
         const cardElement =
             createSavedCardElement(card);
 
-        cardFragment.append(cardElement);
+        cardFragment.append(
+            cardElement
+        );
     });
 
     savedCardList.replaceChildren(
@@ -180,7 +194,9 @@ function handleSavedCardListClick(event) {
 
     if (
         !actionButton ||
-        !savedCardList.contains(actionButton)
+        !savedCardList.contains(
+            actionButton
+        )
     ) {
         return;
     }
@@ -200,7 +216,8 @@ function handleSavedCardListClick(event) {
 
         const selectedCard =
             cards.find(
-                (card) => card.id === cardId
+                (card) =>
+                    card.id === cardId
             );
 
         if (!selectedCard) {
@@ -235,7 +252,9 @@ function handleSavedCardListClick(event) {
     }
 
     const result =
-        window.poofStorage.deleteCard(cardId);
+        window.poofStorage.deleteCard(
+            cardId
+        );
 
     if (!result.success) {
         window.alert(
@@ -247,7 +266,9 @@ function handleSavedCardListClick(event) {
     }
 
     window.dispatchEvent(
-        new CustomEvent("poof:cards-changed")
+        new CustomEvent(
+            "poof:cards-changed"
+        )
     );
 }
 
