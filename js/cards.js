@@ -409,12 +409,9 @@ function handleSavedCardListClick(event) {
     }
 
     if (action === "edit-card") {
-        const cards = getStoredCards();
-
         const selectedCard =
-            cards.find(
-                (card) =>
-                    card.id === cardId
+            window.poofStorage.getCardById(
+                cardId
             );
 
         if (!selectedCard) {
@@ -435,7 +432,7 @@ function handleSavedCardListClick(event) {
         return;
     }
 
-        if (action === "delete-card") {
+    if (action === "delete-card") {
         openDeleteCardDialog(cardId);
     }
 }
