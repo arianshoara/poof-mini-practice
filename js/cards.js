@@ -308,11 +308,9 @@ function renderSavedCards() {
 }
 
 function openDeleteCardDialog(cardId) {
-    const cards = getStoredCards();
-
     const selectedCard =
-        cards.find(
-            (card) => card.id === cardId
+        window.poofStorage.getCardById(
+            cardId
         );
 
     if (!selectedCard) {
