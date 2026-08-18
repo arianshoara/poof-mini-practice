@@ -305,6 +305,9 @@ function readCardStorage() {
             return createEmptyCardStorage();
         }
 
+        const parsedValue =
+            parseCardStorage(storedValue);
+
         const schemaVersion =
                     getCardStorageSchemaVersion(
                         parsedValue
