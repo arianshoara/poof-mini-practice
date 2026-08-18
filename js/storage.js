@@ -264,16 +264,27 @@ function isValidCardStorage(storageData) {
     );
 }
 
+function readRawCardStorage() {
+    return localStorage.getItem(
+        CARD_STORAGE_KEY
+    );
+}
+
+function parseCardStorage(storedValue) {
+    return JSON.parse(storedValue);
+}
+
 function readCardStorage() {
     try {
         const storedValue =
-            localStorage.getItem(CARD_STORAGE_KEY);
+                readRawCardStorage();
 
         if (storedValue === null) {
             return createEmptyCardStorage();
         }
 
-        const parsedValue = JSON.parse(storedValue);
+        const parsedValue =
+            parseCardStorage(storedValue);
 
         if (!isValidCardStorage(parsedValue)) {
             console.error(
