@@ -1,6 +1,9 @@
 const CARD_STORAGE_KEY =
     "poof-mini-card-storage";
 
+const CARD_STORAGE_BACKUP_KEY =
+    "poof-mini-card-storage-backup";
+
 const CURRENT_CARD_SCHEMA_VERSION = 1;
 
 const CARD_STORAGE_MIGRATIONS = {};
@@ -287,6 +290,58 @@ function readRawCardStorage() {
     return localStorage.getItem(
         CARD_STORAGE_KEY
     );
+}
+
+function readRawCardStorageBackup() {
+    return localStorage.getItem(
+        CARD_STORAGE_BACKUP_KEY
+    );
+}
+
+function writeRawCardStorageBackup(
+    storedValue
+) {
+    localStorage.setItem(
+        CARD_STORAGE_BACKUP_KEY,
+        storedValue
+    );
+}
+
+function createCardStorageBackup() {
+    const storedValue =
+        readRawCardStorage();
+
+    if (storedValue === null) {
+        return {
+            success: true,
+            backupCreated: false,
+            error: null
+        };
+    }
+
+    try {
+        writeRawCardStorageBackup(
+            storedValue
+        );
+
+        return {
+            success: true,
+            backupCreated: true,
+            error: null
+        };
+    } catch (error) {
+        console.error(
+            "Failed to create card storage backup:",
+            error
+        );
+
+        return {
+            success: false,
+            backupCreated: false,
+            error:
+                "Card storage backup could not be created."
+        };
+    }
 }
 
 function parseCardStorage(storedValue) {
@@ -587,10 +642,32 @@ function writeCardStorage(storageData) {
         return false;
     }
 
-    try {
-        const serializedValue =
-            JSON.stringify(storageData);
+    let serializedValue;
 
+    try {
+        serializedValue =
+            JSON.stringify(storageData);
+    } catch (error) {
+        console.error(
+            "Failed to serialize card storage:",
+            error
+        );
+
+        return false;
+    }
+
+    const backupResult =
+        createCardStorageBackup();
+
+    if (!backupResult.success) {
+        console.error(
+            "Card storage write stopped because backup failed."
+        );
+
+        return false;
+    }
+
+    try {
         localStorage.setItem(
             CARD_STORAGE_KEY,
             serializedValue
