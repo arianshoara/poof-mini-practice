@@ -318,7 +318,7 @@ function readCardStorage() {
                         "Card storage schema version is missing or invalid."
                     );
                 
-                    return createEmptyCardStorage();
+                    return null;
                 }
                 
                 if (
@@ -330,16 +330,16 @@ function readCardStorage() {
                         schemaVersion
                     );
                 
-                    return createEmptyCardStorage();
+                    return null;
                 }
 
-        if (!isValidCardStorage(parsedValue)) {
-            console.error(
-                "Invalid card storage structure."
-            );
-
-            return createEmptyCardStorage();
-        }
+                if (!isValidCardStorage(parsedValue)) {
+                    console.error(
+                        "Invalid card storage structure."
+                    );
+                
+                    return null;
+                }
 
         return parsedValue;
     } catch (error) {
@@ -348,7 +348,7 @@ function readCardStorage() {
             error
         );
 
-        return createEmptyCardStorage();
+        return null;
     }
 }
 
@@ -382,7 +382,12 @@ function writeCardStorage(storageData) {
 }
 
 function getCards() {
-    const storageData = readCardStorage();
+    const storageData =
+        readCardStorage();
+
+    if (storageData === null) {
+        return [];
+    }
 
     return [...storageData.cards];
 }
@@ -419,6 +424,15 @@ function addCard(cardInput) {
     }
 
     const storageData = readCardStorage();
+
+    if (storageData === null) {
+            return {
+                success: false,
+                card: null,
+                error:
+                    "Card storage could not be read safely."
+            };
+        }
 
     const newCard =
         createStoredCard(cardInput);
@@ -479,6 +493,14 @@ function updateCard(cardId, changes) {
     }
 
     const storageData = readCardStorage();
+            if (storageData === null) {
+            return {
+                success: false,
+                card: null,
+                error:
+                    "Card storage could not be read safely."
+            };
+        }
 
     const cardIndex = storageData.cards.findIndex(
         (card) => card.id === cardId
@@ -583,6 +605,14 @@ function deleteCard(cardId) {
     }
 
     const storageData = readCardStorage();
+            if (storageData === null) {
+            return {
+                success: false,
+                card: null,
+                error:
+                    "Card storage could not be read safely."
+            };
+        }
 
     const cardIndex = storageData.cards.findIndex(
         (card) => card.id === cardId
