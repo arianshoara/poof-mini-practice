@@ -215,26 +215,31 @@ function sortSavedCards(cards, sortMode) {
     const sortedCards = [...cards];
 
     if (sortMode === "oldest") {
-        return sortedCards;
+        return sortedCards.sort(
+            (firstCard, secondCard) =>
+                new Date(firstCard.created_at).getTime() -
+                new Date(secondCard.created_at).getTime()
+        );
     }
 
     if (sortMode === "alphabetical") {
         return sortedCards.sort(
             (firstCard, secondCard) =>
-                String(firstCard.word || "")
-                    .localeCompare(
-                        String(
-                            secondCard.word || ""
-                        ),
-                        "de",
-                        {
-                            sensitivity: "base"
-                        }
-                    )
+                String(firstCard.word || "").localeCompare(
+                    String(secondCard.word || ""),
+                    "de",
+                    {
+                        sensitivity: "base"
+                    }
+                )
         );
     }
 
-    return sortedCards.reverse();
+    return sortedCards.sort(
+        (firstCard, secondCard) =>
+            new Date(secondCard.created_at).getTime() -
+            new Date(firstCard.created_at).getTime()
+    );
 }
 
 function renderSavedCards() {
