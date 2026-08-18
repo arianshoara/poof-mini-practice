@@ -172,7 +172,11 @@
 - [x] `updateCard()`
 
 
-## آزمایش Card Builder واقعی
+---
+
+# تست نسخه‌ی v0.5.0 — Card Builder & Card Management
+
+## جریان واقعی ویرایش
 
 - [x] `getCardById()` از طریق جریان واقعی Edit آزمایش شد
 - [x] `updateCard()` از طریق Card Builder واقعی آزمایش شد
@@ -181,20 +185,68 @@
 - [x] هنگام ویرایش، `updated_at` تغییر کرد
 - [x] محتوای ویرایش‌شده بعد از Refresh باقی ماند
 
+## مرتب‌سازی کارت‌ها
+
+- [x] Newest براساس `created_at` درست مرتب می‌شود
+- [x] Oldest براساس `created_at` درست مرتب می‌شود
+- [x] Alphabetical درست کار می‌کند
+- [x] ویرایش کارت ترتیب زمانی مبتنی بر `created_at` را تغییر نمی‌دهد
+- [x] مرتب‌سازی بعد از Refresh همچنان درست است
+
+## حفظ انتخاب Sort
+
+- [x] انتخاب Oldest بعد از Refresh باقی می‌ماند
+- [x] انتخاب Alphabetical بعد از Refresh باقی می‌ماند
+- [x] انتخاب Newest بعد از Refresh باقی می‌ماند
+- [x] انتخاب Sort بعد از رفتن به صفحه‌ی دیگر و بازگشت به Cards باقی می‌ماند
+- [x] ترتیب واقعی کارت‌ها با گزینه‌ی Sort ذخیره‌شده هماهنگ باقی می‌ماند
+
+## Regression اصلی
+
+جریان کامل زیر با موفقیت آزمایش شد:
+
+`Create → Refresh → Edit → Refresh → Search → Sort → Delete → Refresh`
+
+- [x] کارت جدید ساخته می‌شود
+- [x] کارت بعد از Refresh باقی می‌ماند
+- [x] Edit همان کارت را تغییر می‌دهد و Duplicate ایجاد نمی‌کند
+- [x] تغییرات Edit بعد از Refresh باقی می‌مانند
+- [x] Search برای نتیجه‌ی موجود درست کار می‌کند
+- [x] Search برای نتیجه‌ی ناموجود درست کار می‌کند
+- [x] هر سه حالت Sort بدون حذف یا Duplicate کارت‌ها کار می‌کنند
+- [x] Delete Confirmation درست کار می‌کند
+- [x] فقط کارت انتخاب‌شده حذف می‌شود
+- [x] کارت حذف‌شده بعد از Refresh بازنمی‌گردد
+- [x] سایر کارت‌ها بعد از Delete سالم باقی می‌مانند
+
+## Desktop، Theme و Console
+
+- [x] جریان Card Management در Desktop آزمایش شد
+- [x] جریان Card Management در Classic آزمایش شد
+- [x] جریان Card Management در Snowy آزمایش شد
+- [x] تغییر Theme منطق Card Management را تغییر نمی‌دهد
+- [x] Delete Dialog در هر دو Theme درست نمایش داده می‌شود
+- [x] هنگام جریان آزمایش‌شده Console Error مرتبط با پروژه مشاهده نشد
+
+## Mobile
+
+- [x] صفحه‌ی Cards در Mobile درست نمایش داده می‌شود
+- [x] Card Builder در Mobile قابل استفاده است
+- [x] Search و Sort در Mobile قابل استفاده‌اند
+- [x] Edit و Delete در Mobile کار می‌کنند
+- [x] Delete Dialog در Mobile داخل صفحه درست نمایش داده می‌شود
+- [x] Bottom Navigation مانع استفاده از Cards نمی‌شود
+- [x] جریان کارت در Classic روی Mobile آزمایش شد
+- [x] جریان کارت در Snowy روی Mobile آزمایش شد
+- [x] در عرض حدود `320px` اسکرول افقی ناخواسته مشاهده نشد
+- [x] در عرض حدود `320px` Search، Sort و Delete Dialog قابل استفاده باقی ماندند
+
 ## آزمایش‌های عقب‌افتاده
 
-داده‌ی خراب، نسخه‌ی Schema ناسازگار و شناسه‌های تکراری هنوز عمداً داخل Storage اصلی مرورگر تزریق نشده‌اند.
+داده‌ی خراب، نسخه‌ی Schema ناسازگار و شناسه‌های تکراری عمداً داخل Storage اصلی مرورگر تزریق نشدند.
 
-این موارد هنگام اضافه‌شدن تست‌های خودکار بررسی خواهند شد.
-
-وضعیت:
-
-**Card Builder update flow verified — advanced validation tests pending**
-
-داده‌ی خراب، نسخه‌ی Schema ناسازگار و شناسه‌های تکراری نیز عمداً داخل Storage اصلی مرورگر تزریق نشدند.
-
-این موارد در نسخه‌ی Card Builder یا هنگام اضافه‌شدن تست‌های خودکار بررسی خواهند شد.
+این موارد در Milestone مربوط به Migration/Recovery یا هنگام اضافه‌شدن تست‌های خودکار بررسی خواهند شد.
 
 وضعیت:
 
-**Core storage flow verified — advanced validation tests pending**
+**v0.5.0 core regression verified — advanced storage validation pending**
