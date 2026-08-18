@@ -32,7 +32,7 @@ const EDITABLE_CARD_FIELDS = [
 
 function createEmptyCardStorage() {
     return {
-        schema_version: CARD_SCHEMA_VERSION,
+        schema_version: CURRENT_CARD_SCHEMA_VERSION,
         cards: []
     };
 }
@@ -243,7 +243,7 @@ function isValidCardStorage(storageData) {
 
     if (
         storageData.schema_version !==
-        CARD_SCHEMA_VERSION
+        CURRENT_CARD_SCHEMA_VERSION
     ) {
         return false;
     }
