@@ -11,6 +11,7 @@ const CARD_STORAGE_READ_STATUS = {
     INVALID_JSON: "invalid_json",
     INVALID_VERSION: "invalid_version",
     FUTURE_VERSION: "future_version",
+    MIGRATION_FAILED: "migration_failed",
     INVALID_STRUCTURE: "invalid_structure"
 };
 
@@ -32,9 +33,12 @@ const EDITABLE_CARD_FIELDS = [
     "source_text"
 ];
 
-function createEmptyCardStorage() {
+function createEmptyCardStorage(
+    schemaVersion =
+        CURRENT_CARD_SCHEMA_VERSION
+) {
     return {
-        schema_version: CURRENT_CARD_SCHEMA_VERSION,
+        schema_version: schemaVersion,
         cards: []
     };
 }
@@ -234,7 +238,11 @@ function createStoredCard(cardInput) {
     };
 }
 
-function isValidCardStorage(storageData) {
+function isValidCardStorage(
+    storageData,
+    expectedSchemaVersion =
+        CURRENT_CARD_SCHEMA_VERSION
+) {
     if (
         storageData === null ||
         typeof storageData !== "object" ||
@@ -245,7 +253,7 @@ function isValidCardStorage(storageData) {
 
     if (
         storageData.schema_version !==
-        CURRENT_CARD_SCHEMA_VERSION
+        expectedSchemaVersion
     ) {
         return false;
     }
@@ -419,7 +427,10 @@ function migrateCardStorage(
     };
 }
 
-function readCardStorageResult() {
+function readCardStorageResult(
+    targetVersion =
+        CURRENT_CARD_SCHEMA_VERSION
+) {
     const storedValue =
         readRawCardStorage();
 
@@ -427,7 +438,10 @@ function readCardStorageResult() {
         return {
             status:
                 CARD_STORAGE_READ_STATUS.EMPTY,
-            storage: createEmptyCardStorage(),
+            storage:
+                createEmptyCardStorage(
+                    targetVersion
+                ),
             error: null
         };
     }
@@ -472,7 +486,7 @@ function readCardStorageResult() {
 
     if (
         schemaVersion >
-        CURRENT_CARD_SCHEMA_VERSION
+        targetVersion
     ) {
         console.error(
             "Card storage uses a future schema version:",
@@ -488,7 +502,45 @@ function readCardStorageResult() {
         };
     }
 
-    if (!isValidCardStorage(parsedValue)) {
+    let storageToValidate =
+        parsedValue;
+
+    if (
+        schemaVersion <
+        targetVersion
+    ) {
+        const migrationResult =
+            migrateCardStorage(
+                parsedValue,
+                schemaVersion,
+                targetVersion
+            );
+
+        if (!migrationResult.success) {
+            console.error(
+                "Card storage could not be migrated:",
+                migrationResult.error
+            );
+
+            return {
+                status:
+                    CARD_STORAGE_READ_STATUS.MIGRATION_FAILED,
+                storage: null,
+                error:
+                    migrationResult.error
+            };
+        }
+
+        storageToValidate =
+            migrationResult.storage;
+    }
+
+    if (
+        !isValidCardStorage(
+            storageToValidate,
+            targetVersion
+        )
+    ) {
         console.error(
             "Invalid card storage structure."
         );
@@ -505,7 +557,7 @@ function readCardStorageResult() {
     return {
         status:
             CARD_STORAGE_READ_STATUS.OK,
-        storage: parsedValue,
+        storage: storageToValidate,
         error: null
     };
 }
