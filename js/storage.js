@@ -274,6 +274,28 @@ function parseCardStorage(storedValue) {
     return JSON.parse(storedValue);
 }
 
+function getCardStorageSchemaVersion(storageData) {
+    if (
+        storageData === null ||
+        typeof storageData !== "object" ||
+        Array.isArray(storageData)
+    ) {
+        return null;
+    }
+
+    const schemaVersion =
+        storageData.schema_version;
+
+    if (
+        !Number.isInteger(schemaVersion) ||
+        schemaVersion < 1
+    ) {
+        return null;
+    }
+
+    return schemaVersion;
+}
+
 function readCardStorage() {
     try {
         const storedValue =
@@ -283,8 +305,30 @@ function readCardStorage() {
             return createEmptyCardStorage();
         }
 
-        const parsedValue =
-            parseCardStorage(storedValue);
+        const schemaVersion =
+                    getCardStorageSchemaVersion(
+                        parsedValue
+                    );
+                
+                if (schemaVersion === null) {
+                    console.error(
+                        "Card storage schema version is missing or invalid."
+                    );
+                
+                    return createEmptyCardStorage();
+                }
+                
+                if (
+                    schemaVersion !==
+                    CARD_SCHEMA_VERSION
+                ) {
+                    console.error(
+                        "Unsupported card storage schema version:",
+                        schemaVersion
+                    );
+                
+                    return createEmptyCardStorage();
+                }
 
         if (!isValidCardStorage(parsedValue)) {
             console.error(
