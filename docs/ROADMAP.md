@@ -6,9 +6,10 @@
 
 آخرین وضعیت مبنا هنگام تدوین این نسخه از Roadmap:
 
-- آخرین Release رسمی: `v0.4.0`
-- وضعیت شاخه‌ی `main`: پیاده‌سازی و Regression Test نسخه‌ی `v0.5.0` کامل شده و نسخه در مرحله‌ی آماده‌سازی Release است.
-- Milestone فعال: `v0.5.0 — Card Builder & Card Management`
+- آخرین Release رسمی: `v0.5.0`
+- وضعیت شاخه‌ی `main`: نسخه‌ی `v0.5.0` کامل، آزمایش و منتشر شده است.
+- Milestone فعال: `v0.6.0 — Storage Migration & Recovery`
+  
 - مقصد این Roadmap: `v0.30.0 — POOF Mini Core Alpha`
 
 ---
@@ -378,7 +379,7 @@ Selection
 | `v0.2.0` | Interface Foundation ✅ | Theme System و Mobile Navigation |
 | `v0.3.0` | Data-driven Learn ✅ | JSON، Validation و DOM Rendering |
 | `v0.4.0` | Storage Layer ✅ | Card Storage API و Schema v1 |
-| `v0.5.0` | Card Builder & Management 🚧 | CRUD، Search و Sort کارت‌ها |
+| `v0.5.0` | Card Builder & Management ✅ | CRUD، Search و Sort کارت‌ها |
 | `v0.6.0` | Storage Migration & Recovery | تغییر امن Schema و Recovery |
 | `v0.7.0` | Deck Foundation | Deck Entity و ارتباط Card–Deck |
 | `v0.8.0` | Localization & Bidirectional UI | `fa/de/en` و RTL/LTR |
@@ -417,7 +418,7 @@ Selection
 
 #### وضعیت فعلی
 
-پیاده‌سازی کامل Card Builder و Card Management روی `main` انجام شده است. CRUD، Search، مرتب‌سازی واقعی براساس `created_at`، حفظ Sort Preference و Regression کامل در Classic/Snowy و Mobile/Desktop آزمایش شده‌اند. Milestone فقط منتظر بررسی نهایی مستندات و Release رسمی است.
+پیاده‌سازی و Regression کامل Card Builder و Card Management انجام شده و نسخه‌ی `v0.5.0` به‌صورت رسمی منتشر شده است.
 
 #### کارها
 
@@ -436,7 +437,7 @@ Selection
 - [x] حفظ `id` و `created_at` و تغییر `updated_at` در تست نهایی
 - [x] ثبت تمام تست‌ها در `docs/testing.md`
 - [x] به‌روزرسانی README و بررسی Decision Log
-- [ ] Tag و Release `v0.5.0`
+- [x] Tag و Release `v0.5.0`
 
 #### فایل‌های اصلی
 
@@ -1742,12 +1743,12 @@ Beta Hardening
 ## 11. ترتیب بعدی از وضعیت امروز
 
 ```text
-1. تکمیل استفاده از getCardById در v0.5
-2. مرتب‌سازی زمانی با created_at
-3. Regression Test کامل CRUD/Search/Sort
-4. ثبت v0.5 در testing.md و README
-5. Tag و Release v0.5.0
-6. شروع v0.6 Storage Migration & Recovery
+1. شروع v0.6 Storage Migration & Recovery
+2. بررسی وضعیت فعلی js/storage.js و Card Storage Contract
+3. تعریف CURRENT_SCHEMA_VERSION و رفتار نسخه‌های Storage
+4. طراحی Migration Pipeline بدون Data Loss
+5. اضافه‌کردن Backup و Recovery
+6. آزمایش Schema قدیمی، خراب و نسخه‌ی آینده
 ```
 
 هیچ Feature از نسخه‌ی بعد پیش از بستن Definition of Done نسخه‌ی فعال وارد `main` نمی‌شود.
