@@ -3,6 +3,8 @@ const CARD_STORAGE_KEY =
 
 const CURRENT_CARD_SCHEMA_VERSION = 1;
 
+const CARD_STORAGE_MIGRATIONS = {};
+
 const CARD_STORAGE_READ_STATUS = {
     OK: "ok",
     EMPTY: "empty",
@@ -303,6 +305,118 @@ function getCardStorageSchemaVersion(storageData) {
     }
 
     return schemaVersion;
+}
+
+function migrateCardStorage(
+    storageData,
+    fromVersion,
+    targetVersion = CURRENT_CARD_SCHEMA_VERSION
+) {
+    if (
+        !Number.isInteger(fromVersion) ||
+        !Number.isInteger(targetVersion) ||
+        fromVersion < 1 ||
+        targetVersion < fromVersion
+    ) {
+        return {
+            success: false,
+            storage: null,
+            error:
+                "Invalid card storage migration range."
+        };
+    }
+
+    let migratedStorage;
+
+    try {
+        migratedStorage =
+            JSON.parse(
+                JSON.stringify(storageData)
+            );
+    } catch (error) {
+        return {
+            success: false,
+            storage: null,
+            error:
+                "Card storage could not be cloned for migration."
+        };
+    }
+
+    let currentVersion =
+        fromVersion;
+
+    while (
+        currentVersion <
+        targetVersion
+    ) {
+        const migration =
+            CARD_STORAGE_MIGRATIONS[
+                currentVersion
+            ];
+
+        if (
+            typeof migration !==
+            "function"
+        ) {
+            return {
+                success: false,
+                storage: null,
+                error:
+                    "Missing card storage migration from version " +
+                    currentVersion +
+                    "."
+            };
+        }
+
+        try {
+            migratedStorage =
+                migration(
+                    migratedStorage
+                );
+        } catch (error) {
+            console.error(
+                "Card storage migration failed:",
+                error
+            );
+
+            return {
+                success: false,
+                storage: null,
+                error:
+                    "Card storage migration failed."
+            };
+        }
+
+        const expectedNextVersion =
+            currentVersion + 1;
+
+        if (
+            migratedStorage === null ||
+            typeof migratedStorage !==
+                "object" ||
+            Array.isArray(
+                migratedStorage
+            ) ||
+            migratedStorage.schema_version !==
+                expectedNextVersion
+        ) {
+            return {
+                success: false,
+                storage: null,
+                error:
+                    "Card storage migration returned an invalid next version."
+            };
+        }
+
+        currentVersion =
+            expectedNextVersion;
+    }
+
+    return {
+        success: true,
+        storage: migratedStorage,
+        error: null
+    };
 }
 
 function readCardStorageResult() {
