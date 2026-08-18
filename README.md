@@ -267,7 +267,7 @@ updateCard(cardId, changes)
 deleteCard(cardId)
 ```
 
-### `v0.5.0` — Card Builder & Card Management 🚧
+### `v0.5.0` — Card Builder & Card Management ✅
 
 پیاده‌سازی و Regression Test کامل شده است:
 
@@ -289,11 +289,13 @@ deleteCard(cardId)
 - آزمایش Mobile و Desktop
 - بررسی Console بدون Error مرتبط با پروژه
 
-باقی‌مانده برای انتشار رسمی:
+نسخه‌ی `v0.5.0` پس از تکمیل Implementation، Regression Test، مستندات، Tag و Release به‌صورت رسمی منتشر شده است.
 
-- بررسی نهایی هماهنگی Repository و مستندات
-- آماده‌سازی Release Notes
-- Tag و Release `v0.5.0`
+### `v0.6.0` — Storage Migration & Recovery 🚧
+
+Milestone فعال پروژه.
+
+هدف این نسخه ساخت مسیر امن برای Schema Versioning، Migration، Backup و Recovery است تا داده‌ی قدیمی یا خراب بی‌صدا از بین نرود.
 
 ---
 
