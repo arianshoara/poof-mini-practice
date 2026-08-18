@@ -39,9 +39,56 @@ const savedCardSortSelect =
         "saved-card-sort-select"
     );
 
+const SAVED_CARD_SORT_STORAGE_KEY =
+    "poof-saved-card-sort";
+
+const SAVED_CARD_SORT_MODES = [
+    "newest",
+    "oldest",
+    "alphabetical"
+];
+
+function getSavedCardSortMode() {
+    const savedSortMode =
+        localStorage.getItem(
+            SAVED_CARD_SORT_STORAGE_KEY
+        );
+
+    if (
+        SAVED_CARD_SORT_MODES.includes(
+            savedSortMode
+        )
+    ) {
+        return savedSortMode;
+    }
+
+    return "newest";
+}
+
+function saveSavedCardSortMode(sortMode) {
+    if (
+        !SAVED_CARD_SORT_MODES.includes(
+            sortMode
+        )
+    ) {
+        return;
+    }
+
+    localStorage.setItem(
+        SAVED_CARD_SORT_STORAGE_KEY,
+        sortMode
+    );
+}
+
+let savedCardSortMode =
+    getSavedCardSortMode();
+
+savedCardSortSelect.value =
+    savedCardSortMode;
+
 let pendingDeleteCardId = null;
 let savedCardSearchQuery = "";
-let savedCardSortMode = "newest";
+
 
 
 
@@ -452,8 +499,23 @@ function handleSavedCardSearch(event) {
 }
 
 function handleSavedCardSort(event) {
-    savedCardSortMode =
+    const nextSortMode =
         event.target.value;
+
+    if (
+        !SAVED_CARD_SORT_MODES.includes(
+            nextSortMode
+        )
+    ) {
+        return;
+    }
+
+    savedCardSortMode =
+        nextSortMode;
+
+    saveSavedCardSortMode(
+        savedCardSortMode
+    );
 
     renderSavedCards();
 }
