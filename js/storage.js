@@ -1,7 +1,16 @@
 const CARD_STORAGE_KEY =
     "poof-mini-card-storage";
 
-const CARD_SCHEMA_VERSION = 1;
+const CURRENT_CARD_SCHEMA_VERSION = 1;
+
+const CARD_STORAGE_READ_STATUS = {
+    OK: "ok",
+    EMPTY: "empty",
+    INVALID_JSON: "invalid_json",
+    INVALID_VERSION: "invalid_version",
+    FUTURE_VERSION: "future_version",
+    INVALID_STRUCTURE: "invalid_structure"
+};
 
 const ALLOWED_CARD_SOURCE_TYPES = [
     "manual",
@@ -296,60 +305,111 @@ function getCardStorageSchemaVersion(storageData) {
     return schemaVersion;
 }
 
-function readCardStorage() {
+function readCardStorageResult() {
+    const storedValue =
+        readRawCardStorage();
+
+    if (storedValue === null) {
+        return {
+            status:
+                CARD_STORAGE_READ_STATUS.EMPTY,
+            storage: createEmptyCardStorage(),
+            error: null
+        };
+    }
+
+    let parsedValue;
+
     try {
-        const storedValue =
-                readRawCardStorage();
-
-        if (storedValue === null) {
-            return createEmptyCardStorage();
-        }
-
-        const parsedValue =
+        parsedValue =
             parseCardStorage(storedValue);
-
-        const schemaVersion =
-                    getCardStorageSchemaVersion(
-                        parsedValue
-                    );
-                
-                if (schemaVersion === null) {
-                    console.error(
-                        "Card storage schema version is missing or invalid."
-                    );
-                
-                    return null;
-                }
-                
-                if (
-                    schemaVersion !==
-                    CARD_SCHEMA_VERSION
-                ) {
-                    console.error(
-                        "Unsupported card storage schema version:",
-                        schemaVersion
-                    );
-                
-                    return null;
-                }
-
-                if (!isValidCardStorage(parsedValue)) {
-                    console.error(
-                        "Invalid card storage structure."
-                    );
-                
-                    return null;
-                }
-
-        return parsedValue;
     } catch (error) {
         console.error(
-            "Failed to read card storage:",
+            "Failed to parse card storage:",
             error
         );
 
-        return null;
+        return {
+            status:
+                CARD_STORAGE_READ_STATUS.INVALID_JSON,
+            storage: null,
+            error
+        };
     }
+
+    const schemaVersion =
+        getCardStorageSchemaVersion(
+            parsedValue
+        );
+
+    if (schemaVersion === null) {
+        console.error(
+            "Card storage schema version is missing or invalid."
+        );
+
+        return {
+            status:
+                CARD_STORAGE_READ_STATUS.INVALID_VERSION,
+            storage: null,
+            error:
+                "Card storage schema version is missing or invalid."
+        };
+    }
+
+    if (
+        schemaVersion >
+        CURRENT_CARD_SCHEMA_VERSION
+    ) {
+        console.error(
+            "Card storage uses a future schema version:",
+            schemaVersion
+        );
+
+        return {
+            status:
+                CARD_STORAGE_READ_STATUS.FUTURE_VERSION,
+            storage: null,
+            error:
+                "Card storage uses a future schema version."
+        };
+    }
+
+    if (!isValidCardStorage(parsedValue)) {
+        console.error(
+            "Invalid card storage structure."
+        );
+
+        return {
+            status:
+                CARD_STORAGE_READ_STATUS.INVALID_STRUCTURE,
+            storage: null,
+            error:
+                "Invalid card storage structure."
+        };
+    }
+
+    return {
+        status:
+            CARD_STORAGE_READ_STATUS.OK,
+        storage: parsedValue,
+        error: null
+    };
+}
+
+function readCardStorage() {
+    const readResult =
+        readCardStorageResult();
+
+    if (
+        readResult.status ===
+            CARD_STORAGE_READ_STATUS.OK ||
+        readResult.status ===
+            CARD_STORAGE_READ_STATUS.EMPTY
+    ) {
+        return readResult.storage;
+    }
+
+    return null;
 }
 
 function writeCardStorage(storageData) {
