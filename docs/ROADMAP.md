@@ -7,7 +7,7 @@
 آخرین وضعیت مبنا هنگام تدوین این نسخه از Roadmap:
 
 - آخرین Release رسمی: `v0.4.0`
-- وضعیت شاخه‌ی `main`: بیشتر قابلیت‌های `v0.5.0` پیاده‌سازی شده‌اند.
+- وضعیت شاخه‌ی `main`: پیاده‌سازی و Regression Test نسخه‌ی `v0.5.0` کامل شده و نسخه در مرحله‌ی آماده‌سازی Release است.
 - Milestone فعال: `v0.5.0 — Card Builder & Card Management`
 - مقصد این Roadmap: `v0.30.0 — POOF Mini Core Alpha`
 
@@ -417,7 +417,7 @@ Selection
 
 #### وضعیت فعلی
 
-ساخت، نمایش، ویرایش، حذف با Dialog اختصاصی، Search و Sort روی `main` وجود دارند. این Milestone از ابتدا ساخته نمی‌شود؛ Implementation موجود تکمیل و ثبت می‌شود.
+پیاده‌سازی کامل Card Builder و Card Management روی `main` انجام شده است. CRUD، Search، مرتب‌سازی واقعی براساس `created_at`، حفظ Sort Preference و Regression کامل در Classic/Snowy و Mobile/Desktop آزمایش شده‌اند. Milestone فقط منتظر بررسی نهایی مستندات و Release رسمی است.
 
 #### کارها
 
@@ -430,11 +430,12 @@ Selection
 - [x] اتصال Delete به `poofStorage.deleteCard()`
 - [x] Search در Word، Meaning و Example
 - [x] Sort با Newest، Oldest و Alphabetical
-- [ ] استفاده از `getCardById()` در Edit و Delete
-- [ ] مرتب‌سازی Newest/Oldest براساس `created_at`، نه ترتیب اتفاقی Array
-- [ ] حفظ `id` و `created_at` و تغییر `updated_at` در تست نهایی
-- [ ] ثبت تمام تست‌ها در `docs/testing.md`
-- [ ] به‌روزرسانی README و Decision Log در صورت نیاز
+- [x] استفاده از `getCardById()` در Edit و Delete
+- [x] مرتب‌سازی Newest/Oldest براساس `created_at`، نه ترتیب اتفاقی Array
+- [x] حفظ Sort Preference بعد از Refresh و جابه‌جایی بین صفحه‌ها
+- [x] حفظ `id` و `created_at` و تغییر `updated_at` در تست نهایی
+- [x] ثبت تمام تست‌ها در `docs/testing.md`
+- [x] به‌روزرسانی README و بررسی Decision Log
 - [ ] Tag و Release `v0.5.0`
 
 #### فایل‌های اصلی
