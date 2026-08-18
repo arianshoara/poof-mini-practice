@@ -269,23 +269,30 @@ deleteCard(cardId)
 
 ### `v0.5.0` — Card Builder & Card Management 🚧
 
-پیاده‌سازی‌شده:
+پیاده‌سازی و Regression Test کامل شده است:
 
 - Create Card
 - Render Saved Cards
 - Edit و Cancel Edit
+- استفاده از `getCardById()` در Edit و Delete
 - Delete با Dialog اختصاصی
 - Live Search
-- Newest/Oldest/Alphabetical Sort
+- Newest و Oldest براساس `created_at`
+- Alphabetical Sort
+- حفظ انتخاب Sort بعد از Refresh و جابه‌جایی بین صفحه‌ها
 - Validation و Feedback
 - Persistence after Refresh
+- حفظ `id` و `created_at` هنگام Edit
+- تغییر `updated_at` هنگام Edit
+- Regression کامل CRUD/Search/Sort
+- آزمایش Classic و Snowy
+- آزمایش Mobile و Desktop
+- بررسی Console بدون Error مرتبط با پروژه
 
-باقی‌مانده برای بستن نسخه:
+باقی‌مانده برای انتشار رسمی:
 
-- استفاده از `getCardById()` در Edit و Delete
-- Sort زمانی براساس `created_at`
-- Regression Test کامل
-- ثبت تست‌ها و تصمیم‌های نهایی
+- بررسی نهایی هماهنگی Repository و مستندات
+- آماده‌سازی Release Notes
 - Tag و Release `v0.5.0`
 
 ---
