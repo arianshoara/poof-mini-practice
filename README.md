@@ -317,8 +317,28 @@ Implementation، Migration/Recovery testing و Final Regression کامل شده�
 - Migration Idempotency
 - Fixtureهای دائمی Storage
 - Regression کامل Classic/Snowy و Mobile/Desktop
+  
+نسخه‌ی `v0.6.0` پس از تکمیل Implementation، Migration/Recovery Testing، Final Regression، مستندات، Tag و GitHub Release به‌صورت رسمی منتشر شده است.
 
-این نسخه از نظر Implementation و Testing کامل و آماده‌ی Tag و Release رسمی `v0.6.0` است.
+### `v0.7.0` — Deck Foundation 🚧
+
+Milestone فعال پروژه.
+
+Implementation هنوز شروع نشده است.
+
+هدف این نسخه تبدیل `deck_id = "default"` از یک String صوری به Reference یک Deck Entity واقعی است.
+
+تمرکز اصلی این Milestone:
+
+- تعریف Deck Contract
+- ساخت Deck Entity واقعی
+- Default Deck معتبر
+- Deck CRUD
+- ارتباط واقعی Card و Deck
+- Referential Integrity
+- Migration واقعی Card Storage از Schema فعلی هنگام تغییر Data Contract
+- اتصال Deckهای واقعی به Card Builder
+
 ---
 
 ## Roadmap تا `v0.30.0`
