@@ -5,13 +5,12 @@
 این سند مرجع اجرایی توسعه‌ی POOF Mini Practice است. README فقط نمای کوتاه مسیر را نشان می‌دهد؛ جزئیات ترتیب وابستگی‌ها، قراردادهای داده، هدف آموزشی و معیار پایان هر نسخه در این فایل نگهداری می‌شود.
 
 آخرین وضعیت مبنا هنگام تدوین این نسخه از Roadmap:
+آخرین وضعیت فعلی پروژه:
 
-- آخرین Release رسمی: `v0.5.0`
-- وضعیت شاخه‌ی `main`: نسخه‌ی `v0.5.0` کامل، آزمایش و منتشر شده است.
-- Milestone فعال: `v0.6.0 — Storage Migration & Recovery`
-  
+- آخرین Release رسمی: `v0.6.0`
+- وضعیت شاخه‌ی `main`: نسخه‌ی `v0.6.0` کامل، آزمایش و منتشر شده است.
+- Milestone فعال: `v0.7.0 — Deck Foundation`
 - مقصد این Roadmap: `v0.30.0 — POOF Mini Core Alpha`
-
 ---
 
 ## 1. این Repository قرار است چه شود؟
@@ -380,8 +379,8 @@ Selection
 | `v0.3.0` | Data-driven Learn ✅ | JSON، Validation و DOM Rendering |
 | `v0.4.0` | Storage Layer ✅ | Card Storage API و Schema v1 |
 | `v0.5.0` | Card Builder & Management ✅ | CRUD، Search و Sort کارت‌ها |
-| `v0.6.0` | Storage Migration & Recovery | تغییر امن Schema و Recovery |
-| `v0.7.0` | Deck Foundation | Deck Entity و ارتباط Card–Deck |
+| `v0.6.0` | Storage Migration & Recovery ✅ | تغییر امن Schema و Recovery |
+| `v0.7.0` | Deck Foundation 🚧 | Deck Entity و ارتباط Card–Deck |
 | `v0.8.0` | Localization & Bidirectional UI | `fa/de/en` و RTL/LTR |
 | `v0.9.0` | Dictionary Data Model | Entry/Sense استاندارد |
 | `v0.10.0` | Dictionary Search & Entry View | جست‌وجو و نمایش واژه |
@@ -472,14 +471,11 @@ Create → Refresh → Edit → Refresh → Search → Sort → Delete → Refre
 بدون Console Error، از مسیر Public Storage API، در Classic/Snowy و Mobile/Desktop کار کند.
 
 ---
-
-### `v0.6.0` — Storage Migration & Recovery
-
 #### وضعیت فعلی
 
 Implementation، تست‌های Migration/Recovery و Final Regression کامل شده‌اند.
 
-نسخه آماده‌ی Tag و Release رسمی `v0.6.0` است.
+نسخه‌ی `v0.6.0` با Tag و GitHub Release رسمی منتشر شده و این Milestone بسته شده است.
 
 #### هدف
 
@@ -489,7 +485,7 @@ Implementation، تست‌های Migration/Recovery و Final Regression کامل
 
 Definition of Done با Migrationهای آزمایشی ترتیبی، Failure Stateها، Backup/Recovery، Fixtureها و Regression واقعی Classic/Snowy و Mobile/Desktop تأیید شده است.
 
-Tag و Release رسمی هنوز در Closing Sequence باقی مانده‌اند.
+Tag و GitHub Release رسمی `v0.6.0` تکمیل شده‌اند. این Milestone بسته است و توسعه از `v0.7.0 — Deck Foundation` ادامه پیدا می‌کند.
 
 #### کارها
 - [x] تفکیک مراحل `read raw → parse → detect version → migrate → validate`
@@ -504,6 +500,7 @@ Tag و Release رسمی هنوز در Closing Sequence باقی مانده‌ا�
 - [x] ساخت Fixture برای Schema v1 Baseline، Storage خراب و Future Version
 - [x] ثبت Architecture Decision
 - [x] مستندسازی قانون «هر Schema Change همراه Migration»
+- [x] Tag و GitHub Release رسمی `v0.6.0`
 
 #### فایل‌های مورد انتظار
 
@@ -532,6 +529,14 @@ Storage قدیمی بدون ازدست‌رفتن Cardها قابل خواندن
 ---
 
 ### `v0.7.0` — Deck Foundation
+
+#### وضعیت فعلی
+
+Milestone فعال پروژه است.
+
+Implementation هنوز شروع نشده است.
+
+
 
 #### هدف
 
@@ -1754,12 +1759,14 @@ Beta Hardening
 ## 11. ترتیب بعدی از وضعیت امروز
 
 ```text
-1. شروع v0.6 Storage Migration & Recovery
-2. بررسی وضعیت فعلی js/storage.js و Card Storage Contract
-3. تعریف CURRENT_SCHEMA_VERSION و رفتار نسخه‌های Storage
-4. طراحی Migration Pipeline بدون Data Loss
-5. اضافه‌کردن Backup و Recovery
-6. آزمایش Schema قدیمی، خراب و نسخه‌ی آینده
+
+1. شروع v0.7 Deck Foundation
+2. بررسی Card Storage Contract، js/storage.js و Card Builder
+3. تعریف Deck Contract، Validation و قوانین Default Deck
+4. طراحی Schema جدید و Migration واقعی از Schema v1
+5. ساخت Deck CRUD و Referential Integrity میان Card و Deck
+6. اتصال Deckهای واقعی به Card Builder و اجرای Regression Test
+
 ```
 
 هیچ Feature از نسخه‌ی بعد پیش از بستن Definition of Done نسخه‌ی فعال وارد `main` نمی‌شود.
