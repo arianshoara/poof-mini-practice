@@ -653,6 +653,38 @@ function readCardStorageBackupResult(
     };
 }
 
+function getCardStorageRecoveryStatus() {
+    const backupResult =
+        readCardStorageBackupResult();
+
+    if (!backupResult.available) {
+        return {
+            available: false,
+            canRestore: false,
+            status: "no_backup",
+            error:
+                "No card storage backup is available."
+        };
+    }
+
+    const readResult =
+        backupResult.readResult;
+
+    const canRestore =
+        readResult.status ===
+        CARD_STORAGE_READ_STATUS.OK;
+
+    return {
+        available: true,
+        canRestore,
+        status: readResult.status,
+        error:
+            canRestore
+                ? null
+                : "No safe card storage backup is available."
+    };
+}
+
 function restoreCardStorageFromBackup(
     options = {}
 ) {
@@ -1111,5 +1143,6 @@ window.poofStorage = {
     addCard,
     updateCard,
     deleteCard,
+    getCardStorageRecoveryStatus,
     restoreCardStorageFromBackup
 };
