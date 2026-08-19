@@ -642,3 +642,198 @@ The same architectural principle can later be applied to:
 - Review history
 - Library progress
 - User settings
+
+---
+
+## Decision 006 — Use Explicit, Fail-Safe Card Storage Migrations and Recovery
+
+Status: Accepted
+
+Date: 2026-08-19
+
+### Context
+
+POOF Mini Practice stores personal card data in browser localStorage.
+
+The Card Storage envelope already contains a `schema_version`, but before `v0.6.0` that value did not drive a real migration process.
+
+This created an important risk.
+
+If the stored structure changed in a future version, older user data could fail validation. If that failure were treated as an empty Storage state, the application could incorrectly appear to have no saved cards and a later write could overwrite the original data.
+
+Storage failures must therefore be distinguishable from genuinely empty Storage.
+
+The system also needs a controlled recovery path when a valid backup exists.
+
+### Decision
+
+Card Storage will use an explicit, sequential, fail-safe migration pipeline.
+
+The current schema is identified by:
+
+`CURRENT_CARD_SCHEMA_VERSION`
+
+Storage is processed through the following stages:
+
+    read raw
+    → parse
+    → detect schema version
+    → migrate when required
+    → validate
+    → expose result
+
+These stages must remain logically separate so that a failure can be identified before any mutation occurs.
+
+### Read Result States
+
+Card Storage reads use explicit states instead of treating every failure as an empty card list.
+
+The current states include:
+
+    ok
+    empty
+    invalid_json
+    invalid_version
+    future_version
+    migration_failed
+    invalid_structure
+
+`empty` means no Card Storage exists.
+
+The other failure states must not silently become `empty`.
+
+The UI may present these failures as an Error State while preserving the underlying stored data.
+
+### Migration Strategy
+
+Migrations are registered sequentially.
+
+A migration registered for version `N` is responsible only for:
+
+    N → N + 1
+
+For example:
+
+    1 → 2
+    2 → 3
+    3 → 4
+
+A migration from version `1` to version `4` must therefore pass through all required intermediate migrations.
+
+Missing migration steps stop the process.
+
+The system must not guess how to transform an unknown schema.
+
+Migration logic works on a cloned representation of the stored data so the original parsed object is not mutated during migration.
+
+Already-current Storage does not run previous migrations again.
+
+This preserves migration idempotency at the pipeline level.
+
+### Future Versions
+
+If stored data has a schema version newer than the version understood by the running application, the Storage is classified as:
+
+`future_version`
+
+The application must not downgrade, rewrite, reset, or silently reinterpret that data.
+
+This protects data created by a newer application version from being damaged by an older version.
+
+### Backup Before Mutation
+
+Before normal Card Storage writes, the existing raw Storage value is copied to a dedicated backup key.
+
+The backup stores the raw previous value rather than a newly reconstructed approximation.
+
+If the backup cannot be created, the normal write is stopped.
+
+The main Storage must not be mutated when the required backup step fails.
+
+### Recovery
+
+Recovery is separate from normal Storage writes.
+
+A backup must first pass through the same safe processing pipeline:
+
+    parse
+    → detect version
+    → migrate when required
+    → validate
+
+An invalid backup is not recoverable.
+
+A valid older backup may be migrated in memory before it is restored.
+
+Recovery must require explicit user confirmation.
+
+The application must not automatically replace primary Card Storage merely because a backup exists.
+
+The current UI uses a two-step recovery interaction:
+
+    Restore last backup
+    → Confirm restore
+    → restore
+
+### UI Boundary
+
+The Cards UI must not directly inspect or mutate localStorage.
+
+Storage errors and recovery availability are exposed through the public Storage API.
+
+This keeps the existing architectural boundary:
+
+    UI
+    → Public Storage API
+    → Storage / Migration / Recovery logic
+    → localStorage
+
+The UI distinguishes at least:
+
+    valid data
+    empty data
+    unreadable data
+    recoverable unreadable data
+
+Unreadable Storage must not be presented as if the user simply has no cards.
+
+### Schema Change Rule
+
+Every future structural change to persisted Card Storage must include an explicit migration path from the previous supported schema.
+
+Changing the Storage contract without defining the required migration is not considered a complete schema change.
+
+A schema version must not be increased only to create an artificial migration.
+
+Schema versions change when the persisted data contract actually changes.
+
+### Consequences
+
+Positive consequences:
+
+- Older Storage can be upgraded through explicit steps.
+- Invalid JSON is distinguishable from empty Storage.
+- Unsupported future Storage is preserved instead of rewritten.
+- Missing migrations fail safely.
+- Writes stop when required backup creation fails.
+- Recovery uses validated data.
+- Recovery requires an informed user action.
+- UI error states no longer imply that personal cards were deleted.
+- Migration behavior can be tested with reusable fixtures.
+
+Trade-offs:
+
+- Storage logic is more complex than direct localStorage access.
+- Every persisted schema change requires migration maintenance.
+- Backup data consumes additional browser Storage.
+- Recovery currently protects only data still present in the same browser and device.
+- localStorage remains local persistence and is not a substitute for a remote database or cross-device backup.
+
+### Relationship to Decision 005
+
+Decision 005 established the shared Card Storage boundary and introduced `schema_version`.
+
+This decision extends that architecture with real migration, backup, failure reporting, and recovery behavior.
+
+The earlier limitations in Decision 005 stating that Card Storage did not yet perform migrations or provide backup/recovery describe the state before `v0.6.0` and are superseded by this decision.
+
