@@ -241,12 +241,204 @@
 - [x] در عرض حدود `320px` اسکرول افقی ناخواسته مشاهده نشد
 - [x] در عرض حدود `320px` Search، Sort و Delete Dialog قابل استفاده باقی ماندند
 
-## آزمایش‌های عقب‌افتاده
 
-داده‌ی خراب، نسخه‌ی Schema ناسازگار و شناسه‌های تکراری عمداً داخل Storage اصلی مرورگر تزریق نشدند.
 
-این موارد در Milestone مربوط به Migration/Recovery یا هنگام اضافه‌شدن تست‌های خودکار بررسی خواهند شد.
+
+##---
+
+# تست نسخه‌ی v0.6.0 — Storage Migration & Recovery
+
+## تفکیک مسیر خواندن Storage
+
+- [x] خواندن Raw Storage از Parse جدا شد
+- [x] Parse داده‌ی JSON به مرحله‌ی مستقل تبدیل شد
+- [x] تشخیص `schema_version` به‌صورت مستقل انجام می‌شود
+- [x] Validation بعد از تشخیص Version انجام می‌شود
+- [x] خطای Parse به Empty Storage تبدیل نمی‌شود
+- [x] Failure در مسیر Read باعث حذف یا overwrite داده‌ی اصلی نمی‌شود
+
+## Result Stateهای خواندن
+
+حالت‌های اصلی خواندن Storage به‌صورت مستقل آزمایش شدند:
+
+- [x] `ok`
+- [x] `empty`
+- [x] `invalid_json`
+- [x] `invalid_version`
+- [x] `future_version`
+- [x] `migration_failed`
+- [x] `invalid_structure`
+
+- [x] Missing Version به‌عنوان Storage معتبر یا Empty پذیرفته نمی‌شود
+- [x] Future Version بدون Downgrade یا Rewrite متوقف می‌شود
+- [x] Invalid JSON بدون overwrite داده‌ی خام متوقف می‌شود
+- [x] Invalid Structure از Empty Storage متمایز باقی می‌ماند
+
+## جلوگیری از Write بعد از Read Failure
+
+- [x] `addCard()` بعد از Read Failure متوقف می‌شود
+- [x] هنگام Read Failure هیچ Writeای انجام نمی‌شود
+- [x] Write Attempt با Mock بررسی شد و مقدار `false` باقی ماند
+- [x] Storage خراب به‌عنوان آرایه‌ی خالی قابل‌نوشتن استفاده نمی‌شود
+
+## Migration Pipeline
+
+- [x] Registry برای Migrationهای ترتیبی ساخته شد
+- [x] Migration آزمایشی `1 → 2 → 3` با موفقیت اجرا شد
+- [x] Migrationها دقیقاً به ترتیب Version اجرا شدند
+- [x] داده‌ی ورودی اصلی هنگام Migration mutate نشد
+- [x] Migration با Version مبدأ و مقصد یکسان به‌صورت No-op موفق عمل کرد
+- [x] Missing Migration Step باعث Failure شد
+- [x] Missing Migration Step باعث Write نشد
+- [x] Migration به مسیر واقعی Read متصل شد
+- [x] Validation روی خروجی Migration انجام شد
+- [x] Migration Failure با Result State مستقل گزارش شد
+
+## Migration Idempotency
+
+- [x] Migration روی Schema قدیمی فقط یک بار اجرا شد
+- [x] داده‌ای که به Version هدف رسیده بود دوباره Migration نشد
+- [x] عبور دوباره‌ی داده‌ی Migration‌شده از Read Pipeline تغییری در آن ایجاد نکرد
+- [x] تعداد اجرای Migration در تست دو مرحله‌ای برابر یک باقی ماند
+- [x] داده‌ی ورودی اصلی در No-op Migration بدون تغییر باقی ماند
+
+## Backup پیش از Mutation
+
+- [x] قبل از Write عادی، Raw Storage قبلی Backup می‌شود
+- [x] Backup یک کپی دقیق از Raw Storage اصلی است
+- [x] برابری Raw Storage و Backup به‌صورت مستقیم بررسی شد
+- [x] نبود Storage قبلی به‌عنوان Failure در Backup در نظر گرفته نمی‌شود
+- [x] Failure در ساخت Backup باعث توقف Write می‌شود
+- [x] هنگام Backup Failure، Storage اصلی بدون تغییر باقی می‌ماند
+- [x] Create، Edit و Delete بعد از اضافه‌شدن Backup همچنان درست کار کردند
+
+## بررسی Backup پیش از Recovery
+
+- [x] Backup سالم از همان Read Pipeline اصلی عبور می‌کند
+- [x] Backup سالم با Status `ok` تشخیص داده شد
+- [x] Backup خراب با Status `invalid_json` تشخیص داده شد
+- [x] نبود Backup از Backup خراب متمایز است
+- [x] نبود Backup با `available: false` گزارش می‌شود
+- [x] Backup موجود ولی خراب با `available: true` و `canRestore: false` گزارش می‌شود
+
+## Restore امن
+
+- [x] Restore بدون تأیید صریح متوقف می‌شود
+- [x] Restore بدون تأیید هیچ Writeای انجام نمی‌دهد
+- [x] Backup سالم بعد از تأیید قابل Restore است
+- [x] Backup خراب حتی با تأیید Restore نمی‌شود
+- [x] Restore Backup خراب هیچ Writeای انجام نمی‌دهد
+- [x] Recovery از مسیر Write عادی جدا باقی می‌ماند
+- [x] Backup سالم هنگام Restore با Storage خراب جایگزین نمی‌شود
+
+## Backup قدیمی و Migration پیش از Restore
+
+- [x] Backup قدیمی پیش از Restore می‌تواند Migration شود
+- [x] Backup Version 1 در تست به Version 2 Migration شد
+- [x] نسخه‌ی Migration‌شده Restore شد
+- [x] Raw Backup اصلی هنگام Migration/Restore بدون تغییر باقی ماند
+- [x] اگر Migration موردنیاز موجود نباشد Restore متوقف می‌شود
+- [x] Missing Migration هنگام Recovery هیچ Writeای انجام نمی‌دهد
+- [x] Exception داخل Migration باعث توقف Recovery می‌شود
+
+## Error State رابط Cards
+
+- [x] Storage خراب دیگر به‌صورت «بدون کارت» نمایش داده نمی‌شود
+- [x] Error State مستقل برای Storage ناخوانا نمایش داده می‌شود
+- [x] پیام `Saved cards unavailable.` در Failure State نمایش داده شد
+- [x] UI اعلام می‌کند داده‌ی ذخیره‌شده overwrite نشده است
+- [x] Search هنگام Storage Error غیرفعال می‌شود
+- [x] Sort هنگام Storage Error غیرفعال می‌شود
+- [x] بعد از برگشت Storage سالم، Cards دوباره Render می‌شوند
+- [x] Error State از Empty State متمایز باقی می‌ماند
+
+## Recovery UI
+
+- [x] Restore فقط وقتی Backup امن وجود دارد پیشنهاد می‌شود
+- [x] دکمه‌ی `Restore last backup` در Error State نمایش داده شد
+- [x] کلیک اول هیچ Restoreای اجرا نمی‌کند
+- [x] کلیک اول دکمه را به `Confirm restore` تبدیل می‌کند
+- [x] Warning پیش از Restore واقعی نمایش داده می‌شود
+- [x] کلیک دوم Restore را با `confirmRestore: true` اجرا می‌کند
+- [x] Restore واقعی فقط یک بار اجرا می‌شود
+- [x] بعد از Restore موفق، UI از Error State خارج می‌شود
+- [x] بعد از پایان تست و Cleanup، کارت‌های واقعی دوباره نمایش داده شدند
+
+## Future Version
+
+- [x] Storage با Schema آینده به `future_version` رسید
+- [x] Future Version باعث اجرای `addCard()` نشد
+- [x] Future Version باعث Write نشد
+- [x] داده‌ی متعلق به Version ناشناخته Downgrade یا Rewrite نشد
+
+## Duplicate Card IDs
+
+- [x] دو Card با ID یکسان به‌عنوان `invalid_structure` تشخیص داده شدند
+- [x] Duplicate ID باعث Read Failure شد
+- [x] Duplicate ID باعث Write نشد
+- [x] Storage دارای Duplicate ID به Empty Storage تبدیل نشد
+
+## Broken Backup و Migration Failure
+
+- [x] Exception داخل Migration به Failure تبدیل شد
+- [x] Migration Failure هنگام Recovery باعث Write نشد
+- [x] Backup دارای JSON خراب قابل Restore شناخته نشد
+- [x] Backup خراب Status `invalid_json` دریافت کرد
+- [x] Backup خراب `canRestore: false` دریافت کرد
+- [x] Recovery از Backup خراب متوقف شد
+- [x] Primary Storage در این Failure Stateها دست‌نخورده باقی ماند
+
+## Fixtureهای دائمی
+
+Fixtureهای Storage در مسیر زیر ایجاد شدند:
+
+`tests/fixtures/card-storage-fixtures.json`
+
+Fixtureهای زیر آزمایش شدند:
+
+- [x] `schema_v1_baseline`
+- [x] `invalid_json_raw`
+- [x] `invalid_structure`
+- [x] `future_version`
+
+Result مورد انتظار Fixtureها:
+
+- [x] Baseline → `ok`
+- [x] Invalid JSON → `invalid_json`
+- [x] Invalid Structure → `invalid_structure`
+- [x] Future Version → `future_version`
+
+- [x] Fixtureها بدون تغییر `localStorage` واقعی به Read Pipeline داده شدند
+- [x] کارت‌های واقعی بعد از تست Fixtureها سالم باقی ماندند
+
+## Regression داده‌ی واقعی
+
+- [x] کارت‌های واقعی بعد از اضافه‌شدن Read Result Stateها باقی ماندند
+- [x] کارت‌های واقعی بعد از اضافه‌شدن Migration Pipeline باقی ماندند
+- [x] کارت‌های واقعی بعد از اضافه‌شدن Backup باقی ماندند
+- [x] کارت‌های واقعی بعد از اضافه‌شدن Recovery باقی ماندند
+- [x] Create بعد از تغییرات Storage همچنان کار می‌کند
+- [x] Edit بعد از تغییرات Storage همچنان کار می‌کند
+- [x] Delete بعد از تغییرات Storage همچنان کار می‌کند
+- [x] Search و Sort بعد از تغییرات Storage همچنان کار می‌کنند
+- [x] Refresh کارت‌های سالم را از بین نمی‌برد
+
+## نتیجه‌ی v0.6.0
+
+رفتار اصلی زیر با تست‌های دستی تأیید شد:
+
+`read raw → parse → detect version → migrate when required → validate`
+
+همچنین مسیر ایمنی زیر تأیید شد:
+
+`read failure → no write → preserve raw data → inspect validated backup → explicit recovery`
+
+Storage خراب، Version آینده، Migration Failure و Duplicate ID دیگر بی‌صدا به Empty Storage تبدیل نمی‌شوند.
+
+Backup پیش از Mutation ایجاد می‌شود و Recovery فقط از Backup اعتبارسنجی‌شده و پس از تأیید صریح کاربر انجام می‌شود.
+
+Fixtureهای دائمی برای Baseline، Invalid JSON، Invalid Structure و Future Version ایجاد و آزمایش شدند.
 
 وضعیت:
 
-**v0.5.0 core regression verified — advanced storage validation pending**
+**v0.6.0 migration and recovery behavior verified — final regression and release preparation pending**
