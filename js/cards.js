@@ -294,35 +294,85 @@ function sortSavedCards(cards, sortMode) {
     );
 }
 
+function createStorageErrorState() {
+    const errorState =
+        document.createElement("div");
+
+    errorState.className =
+        "saved-card";
+
+    const errorMessage =
+        document.createElement("p");
+
+    errorMessage.textContent =
+        "Your saved cards could not be read safely. Your stored data was not overwritten.";
+
+    errorState.append(
+        errorMessage
+    );
+
+    const recoveryStatus =
+        window.poofStorage
+            .getCardStorageRecoveryStatus();
+
+    if (!recoveryStatus.canRestore) {
+        const recoveryMessage =
+            document.createElement("p");
+
+        recoveryMessage.className =
+            "saved-card__example";
+
+        recoveryMessage.textContent =
+            "No safe backup is currently available.";
+
+        errorState.append(
+            recoveryMessage
+        );
+
+        return errorState;
+    }
+
+    const restoreButton =
+        document.createElement("button");
+
+    restoreButton.type = "button";
+
+    restoreButton.className =
+        "saved-card__edit";
+
+    restoreButton.dataset.action =
+        "restore-card-backup";
+
+    restoreButton.textContent =
+        "Restore last backup";
+
+    errorState.append(
+        restoreButton
+    );
+
+    return errorState;
+}
+
 function renderSavedCards() {
     const result =
         getStoredCardsResult();
 
     if (!result.success) {
-        savedCardsCount.textContent =
-            "Saved cards unavailable.";
-
-        const errorMessage =
-            document.createElement("p");
-
-        errorMessage.className =
-            "saved-card-list__empty";
-
-        errorMessage.textContent =
-            "Your saved cards could not be read safely. Your stored data was not overwritten.";
-
-        savedCardList.replaceChildren(
-            errorMessage
-        );
-
-        savedCardSearchInput.disabled =
-            true;
-
-        savedCardSortSelect.disabled =
-            true;
-
-        return;
-    }
+            savedCardsCount.textContent =
+                "Saved cards unavailable.";
+        
+            savedCardSearchInput.disabled =
+                true;
+        
+            savedCardSortSelect.disabled =
+                true;
+        
+            savedCardList.replaceChildren(
+                createStorageErrorState()
+            );
+        
+            return;
+        }
 
     savedCardSearchInput.disabled =
         false;
@@ -475,6 +525,75 @@ function resetDeleteCardDialog() {
         false;
 }
 
+function handleCardStorageRestore(
+    restoreButton
+) {
+    if (
+        restoreButton.dataset
+            .confirmRestore !== "true"
+    ) {
+        restoreButton.dataset
+            .confirmRestore = "true";
+
+        restoreButton.textContent =
+            "Confirm restore";
+
+        const warning =
+            document.createElement("p");
+
+        warning.className =
+            "saved-card__example";
+
+        warning.dataset.recoveryWarning =
+            "true";
+
+        warning.textContent =
+            "This will replace the unreadable card storage with the last validated backup. Click Confirm restore again to continue.";
+
+        restoreButton.before(
+            warning
+        );
+
+        return;
+    }
+
+    restoreButton.disabled =
+        true;
+
+    const result =
+        window.poofStorage
+            .restoreCardStorageFromBackup({
+                confirmRestore: true
+            });
+
+    if (!result.success) {
+        restoreButton.disabled =
+            false;
+
+        restoreButton.textContent =
+            "Restore last backup";
+
+        restoreButton.dataset
+            .confirmRestore = "false";
+
+        const warning =
+            restoreButton.parentElement
+                ?.querySelector(
+                    "[data-recovery-warning]"
+                );
+
+        if (warning) {
+            warning.textContent =
+                result.error ||
+                "The backup could not be restored.";
+        }
+
+        return;
+    }
+
+    renderSavedCards();
+}
+
 function handleSavedCardListClick(event) {
     const actionButton =
         event.target.closest(
@@ -492,6 +611,17 @@ function handleSavedCardListClick(event) {
 
     const action =
         actionButton.dataset.action;
+
+    if (
+            action ===
+            "restore-card-backup"
+        ) {
+            handleCardStorageRestore(
+                actionButton
+            );
+        
+            return;
+        }
 
     const cardId =
         actionButton.dataset.cardId;
