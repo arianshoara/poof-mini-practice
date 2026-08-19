@@ -92,22 +92,27 @@ let savedCardSearchQuery = "";
 
 
 
-function getStoredCards() {
+function getStoredCardsResult() {
     const result =
-        window.poofStorage.getCards();
-
-    if (Array.isArray(result)) {
-        return result;
-    }
+        window.poofStorage
+            .getCardsResult();
 
     if (
         result &&
+        typeof result.success ===
+            "boolean" &&
         Array.isArray(result.cards)
     ) {
-        return result.cards;
+        return result;
     }
 
-    return [];
+    return {
+        success: false,
+        status: "unknown_error",
+        cards: [],
+        error:
+            "Card storage could not be read safely."
+    };
 }
 
 function updateSavedCardsCount(cards) {
@@ -290,7 +295,42 @@ function sortSavedCards(cards, sortMode) {
 }
 
 function renderSavedCards() {
-    const cards = getStoredCards();
+    const result =
+        getStoredCardsResult();
+
+    if (!result.success) {
+        savedCardsCount.textContent =
+            "Saved cards unavailable.";
+
+        const errorMessage =
+            document.createElement("p");
+
+        errorMessage.className =
+            "saved-card-list__empty";
+
+        errorMessage.textContent =
+            "Your saved cards could not be read safely. Your stored data was not overwritten.";
+
+        savedCardList.replaceChildren(
+            errorMessage
+        );
+
+        savedCardSearchInput.disabled =
+            true;
+
+        savedCardSortSelect.disabled =
+            true;
+
+        return;
+    }
+
+    savedCardSearchInput.disabled =
+        false;
+
+    savedCardSortSelect.disabled =
+        false;
+
+    const cards = result.cards;
 
     updateSavedCardsCount(cards);
 
