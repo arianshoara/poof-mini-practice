@@ -291,12 +291,31 @@ deleteCard(cardId)
 
 نسخه‌ی `v0.5.0` پس از تکمیل Implementation، Regression Test، مستندات، Tag و Release به‌صورت رسمی منتشر شده است.
 
-### `v0.6.0` — Storage Migration & Recovery 🚧
+### `v0.6.0` — Storage Migration & Recovery ✅
 
-Milestone فعال پروژه.
+Implementation، Migration/Recovery testing و Final Regression کامل شده‌اند.
 
-هدف این نسخه ساخت مسیر امن برای Schema Versioning، Migration، Backup و Recovery است تا داده‌ی قدیمی یا خراب بی‌صدا از بین نرود.
+قابلیت‌های اصلی این نسخه:
 
+- تفکیک `read raw → parse → detect version → migrate → validate`
+- `CURRENT_CARD_SCHEMA_VERSION`
+- Migration Registry و Pipeline ترتیبی
+- Result Stateهای مستقل برای Storage
+- تشخیص Invalid JSON، Invalid Version و Invalid Structure
+- محافظت در برابر Future Schema Version
+- جلوگیری از Write بعد از Read Failure
+- Backup خام پیش از Mutation
+- توقف Write هنگام Backup Failure
+- Recovery فقط از Backup اعتبارسنجی‌شده
+- Migration Backup قدیمی پیش از Restore
+- Restore فقط پس از تأیید صریح کاربر
+- Error State واقعی در Cards UI
+- Recovery UI دو مرحله‌ای
+- Migration Idempotency
+- Fixtureهای دائمی Storage
+- Regression کامل Classic/Snowy و Mobile/Desktop
+
+این نسخه از نظر Implementation و Testing کامل و آماده‌ی Tag و Release رسمی `v0.6.0` است.
 ---
 
 ## Roadmap تا `v0.30.0`
