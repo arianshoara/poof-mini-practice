@@ -482,4 +482,4 @@ Fixtureهای دائمی برای Baseline، Invalid JSON، Invalid Structure و
 
 وضعیت:
 
-**v0.6.0 implementation, migration/recovery testing and final regression complete — ready for release**
+**v0.6.0 implementation, migration/recovery testing, final regression, tag and GitHub release complete — released**
