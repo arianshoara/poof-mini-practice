@@ -292,6 +292,15 @@ function readRawCardStorage() {
     );
 }
 
+function writeRawCardStorage(
+    storedValue
+) {
+    localStorage.setItem(
+        CARD_STORAGE_KEY,
+        storedValue
+    );
+}
+
 function readRawCardStorageBackup() {
     return localStorage.getItem(
         CARD_STORAGE_BACKUP_KEY
@@ -644,6 +653,95 @@ function readCardStorageBackupResult(
     };
 }
 
+function restoreCardStorageFromBackup(
+    options = {}
+) {
+    if (
+        options === null ||
+        typeof options !== "object" ||
+        options.confirmRestore !== true
+    ) {
+        return {
+            success: false,
+            storage: null,
+            error:
+                "Card storage restore requires explicit confirmation."
+        };
+    }
+
+    const backupResult =
+        readCardStorageBackupResult();
+
+    if (!backupResult.available) {
+        return {
+            success: false,
+            storage: null,
+            error:
+                "No card storage backup is available."
+        };
+    }
+
+    if (
+        backupResult.readResult.status !==
+        CARD_STORAGE_READ_STATUS.OK
+    ) {
+        return {
+            success: false,
+            storage: null,
+            error:
+                "Card storage backup is not safe to restore."
+        };
+    }
+
+    const restoredStorage =
+        backupResult.readResult.storage;
+
+    let serializedValue;
+
+    try {
+        serializedValue =
+            JSON.stringify(
+                restoredStorage
+            );
+    } catch (error) {
+        console.error(
+            "Failed to serialize card storage recovery:",
+            error
+        );
+
+        return {
+            success: false,
+            storage: null,
+            error:
+                "Card storage recovery could not be serialized."
+        };
+    }
+
+    try {
+        writeRawCardStorage(
+            serializedValue
+        );
+
+        return {
+            success: true,
+            storage: restoredStorage,
+            error: null
+        };
+    } catch (error) {
+        console.error(
+            "Failed to restore card storage backup:",
+            error
+        );
+
+        return {
+            success: false,
+            storage: null,
+            error:
+                "Card storage backup could not be restored."
+        };
+    }
+}
+
 function readCardStorage() {
     const readResult =
         readCardStorageResult();
@@ -695,10 +793,9 @@ function writeCardStorage(storageData) {
     }
 
     try {
-        localStorage.setItem(
-            CARD_STORAGE_KEY,
-            serializedValue
-        );
+        writeRawCardStorage(
+                serializedValue
+            );
 
         return true;
     } catch (error) {
@@ -984,5 +1081,6 @@ window.poofStorage = {
     getCardById,
     addCard,
     updateCard,
-    deleteCard
+    deleteCard,
+    restoreCardStorageFromBackup
 };
