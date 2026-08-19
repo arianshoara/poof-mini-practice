@@ -261,10 +261,13 @@ Public API فعلی:
 
 ```text
 getCards()
+getCardsResult()
 getCardById(cardId)
 addCard(cardInput)
 updateCard(cardId, changes)
 deleteCard(cardId)
+getCardStorageRecoveryStatus()
+restoreCardStorageFromBackup(options)
 ```
 
 ### `v0.5.0` — Card Builder & Card Management ✅
