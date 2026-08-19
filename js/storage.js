@@ -484,10 +484,13 @@ function migrateCardStorage(
 
 function readCardStorageResult(
     targetVersion =
-        CURRENT_CARD_SCHEMA_VERSION
+        CURRENT_CARD_SCHEMA_VERSION,
+    storedValueOverride = undefined
 ) {
     const storedValue =
-        readRawCardStorage();
+        storedValueOverride === undefined
+            ? readRawCardStorage()
+            : storedValueOverride;
 
     if (storedValue === null) {
         return {
@@ -614,6 +617,30 @@ function readCardStorageResult(
             CARD_STORAGE_READ_STATUS.OK,
         storage: storageToValidate,
         error: null
+    };
+}
+
+function readCardStorageBackupResult(
+    targetVersion =
+        CURRENT_CARD_SCHEMA_VERSION
+) {
+    const backupValue =
+        readRawCardStorageBackup();
+
+    if (backupValue === null) {
+        return {
+            available: false,
+            readResult: null
+        };
+    }
+
+    return {
+        available: true,
+        readResult:
+            readCardStorageResult(
+                targetVersion,
+                backupValue
+            )
     };
 }
 
