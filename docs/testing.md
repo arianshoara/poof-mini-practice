@@ -423,6 +423,47 @@ Result مورد انتظار Fixtureها:
 - [x] Search و Sort بعد از تغییرات Storage همچنان کار می‌کنند
 - [x] Refresh کارت‌های سالم را از بین نمی‌برد
 
+## Final Regression
+
+### Desktop / Classic
+
+- [x] Cardهای واقعی در Classic Desktop بدون Error نمایش داده شدند
+- [x] Create از UI واقعی انجام شد
+- [x] Card جدید بعد از Refresh باقی ماند
+- [x] Edit از UI واقعی انجام شد
+- [x] `id` هنگام Edit حفظ شد
+- [x] `created_at` هنگام Edit حفظ شد
+- [x] `updated_at` هنگام Edit تغییر کرد
+- [x] نسخه‌ی ویرایش‌شده بعد از Refresh باقی ماند
+- [x] Search درست کار کرد
+- [x] Newest، Oldest و Alphabetical درست کار کردند
+- [x] Sort Preference بعد از Refresh حفظ شد
+- [x] Delete Confirmation درست کار کرد
+- [x] Card حذف‌شده بعد از Refresh برنگشت
+- [x] Storage نهایی با Status `ok` خوانده شد
+- [x] Cardهای واقعی دیگر حفظ شدند
+- [x] Console Error حل‌نشده مشاهده نشد
+
+### Snowy / Mobile
+
+- [x] Cards در Snowy Desktop درست نمایش داده شدند
+- [x] Search و Sort در Snowy Desktop درست کار کردند
+- [x] Mobile layout در عرض حدود `390px` بررسی شد
+- [x] Create روی Mobile درست کار کرد
+- [x] Card بعد از Mobile Refresh باقی ماند
+- [x] Edit روی Mobile درست کار کرد
+- [x] Search روی Mobile درست کار کرد
+- [x] Sort روی Mobile درست کار کرد
+- [x] Delete Dialog روی Mobile قابل استفاده بود
+- [x] Delete روی Mobile درست کار کرد
+- [x] Card حذف‌شده بعد از Refresh برنگشت
+- [x] Layout در عرض حدود `320px` بررسی شد
+- [x] Horizontal overflow مشاهده نشد
+- [x] Search، Sort و Bottom Navigation در عرض باریک سالم ماندند
+- [x] Storage نهایی با Status `ok` خوانده شد
+- [x] Cardهای واقعی حفظ شدند
+- [x] Console Error حل‌نشده مشاهده نشد
+
 ## نتیجه‌ی v0.6.0
 
 رفتار اصلی زیر با تست‌های دستی تأیید شد:
@@ -441,4 +482,4 @@ Fixtureهای دائمی برای Baseline، Invalid JSON، Invalid Structure و
 
 وضعیت:
 
-**v0.6.0 migration and recovery behavior verified — final regression and release preparation pending**
+**v0.6.0 implementation, migration/recovery testing and final regression complete — ready for release**
