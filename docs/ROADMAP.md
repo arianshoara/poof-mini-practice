@@ -475,24 +475,35 @@ Create → Refresh → Edit → Refresh → Search → Sort → Delete → Refre
 
 ### `v0.6.0` — Storage Migration & Recovery
 
+#### وضعیت فعلی
+
+Implementation، تست‌های Migration/Recovery و Final Regression کامل شده‌اند.
+
+نسخه آماده‌ی Tag و Release رسمی `v0.6.0` است.
+
 #### هدف
 
 تبدیل `schema_version` از یک عدد نمایشی به Migration Pipeline واقعی و جلوگیری از ظاهرشدن داده‌ی قدیمی به‌صورت Storage خالی.
 
-#### کارها
+#### نتیجه
 
-- [ ] تفکیک مراحل `read raw → parse → detect version → migrate → validate`
-- [ ] تعریف `CURRENT_SCHEMA_VERSION`
-- [ ] ساخت Registry/Pipeline برای Migrationهای ترتیبی
-- [ ] تعریف رفتار Missing Version، Unsupported Future Version و Invalid JSON
-- [ ] نگهداری Backup بازیابی‌پذیر پیش از Mutation
-- [ ] جلوگیری از overwrite داده‌ی خام هنگام Failure
-- [ ] تعریف Error Result قابل نمایش برای UI
-- [ ] تعریف Recovery/Reset فقط با تصمیم آگاهانه‌ی کاربر
-- [ ] تضمین Idempotency Migration
-- [ ] ساخت Fixture برای Schema قدیمی، خراب و آینده
-- [ ] ثبت Architecture Decision
-- [ ] مستندسازی قانون «هر Schema Change همراه Migration»
+Definition of Done با Migrationهای آزمایشی ترتیبی، Failure Stateها، Backup/Recovery، Fixtureها و Regression واقعی Classic/Snowy و Mobile/Desktop تأیید شده است.
+
+Tag و Release رسمی هنوز در Closing Sequence باقی مانده‌اند.
+
+#### کارها
+- [x] تفکیک مراحل `read raw → parse → detect version → migrate → validate`
+- [x] تعریف `CURRENT_CARD_SCHEMA_VERSION`
+- [x] ساخت Registry/Pipeline برای Migrationهای ترتیبی
+- [x] تعریف رفتار Missing Version، Unsupported Future Version و Invalid JSON
+- [x] نگهداری Backup بازیابی‌پذیر پیش از Mutation
+- [x] جلوگیری از overwrite داده‌ی خام هنگام Failure
+- [x] تعریف Error Result قابل نمایش برای UI
+- [x] تعریف Recovery و ممنوعیت Reset/Overwrite خودکار بدون تصمیم آگاهانه‌ی کاربر
+- [x] تضمین Idempotency Migration
+- [x] ساخت Fixture برای Schema v1 Baseline، Storage خراب و Future Version
+- [x] ثبت Architecture Decision
+- [x] مستندسازی قانون «هر Schema Change همراه Migration»
 
 #### فایل‌های مورد انتظار
 
