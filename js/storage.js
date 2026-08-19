@@ -808,15 +808,43 @@ function writeCardStorage(storageData) {
     }
 }
 
-function getCards() {
-    const storageData =
-        readCardStorage();
+function getCardsResult() {
+    const readResult =
+        readCardStorageResult();
 
-    if (storageData === null) {
-        return [];
+    if (
+        readResult.status ===
+            CARD_STORAGE_READ_STATUS.OK ||
+        readResult.status ===
+            CARD_STORAGE_READ_STATUS.EMPTY
+    ) {
+        return {
+            success: true,
+            status: readResult.status,
+            cards: [
+                ...readResult.storage.cards
+            ],
+            error: null
+        };
     }
 
-    return [...storageData.cards];
+    return {
+        success: false,
+        status: readResult.status,
+        cards: [],
+        error:
+            typeof readResult.error ===
+            "string"
+                ? readResult.error
+                : "Card storage could not be read safely."
+    };
+}
+
+function getCards() {
+    const result =
+        getCardsResult();
+
+    return result.cards;
 }
 
 function getCardById(cardId) {
@@ -1078,6 +1106,7 @@ function deleteCard(cardId) {
 
 window.poofStorage = {
     getCards,
+    getCardsResult,
     getCardById,
     addCard,
     updateCard,
