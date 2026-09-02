@@ -6,6 +6,10 @@ const CARD_STORAGE_BACKUP_KEY =
 
 const CURRENT_CARD_SCHEMA_VERSION = 1;
 
+const DEFAULT_DECK_ID = "default";
+const DEFAULT_DECK_NAME = "Default Deck";
+const MAX_DECK_NAME_LENGTH = 80;
+
 const CARD_STORAGE_MIGRATIONS = {};
 
 const CARD_STORAGE_READ_STATUS = {
@@ -36,14 +40,35 @@ const EDITABLE_CARD_FIELDS = [
     "source_text"
 ];
 
+function createDefaultDeck(
+    timestamp =
+        new Date().toISOString()
+) {
+    return {
+        id: DEFAULT_DECK_ID,
+        name: DEFAULT_DECK_NAME,
+        is_default: true,
+        created_at: timestamp,
+        updated_at: timestamp
+    };
+}
+
 function createEmptyCardStorage(
     schemaVersion =
         CURRENT_CARD_SCHEMA_VERSION
 ) {
-    return {
+    const storageData = {
         schema_version: schemaVersion,
         cards: []
     };
+
+    if (schemaVersion === 2) {
+        storageData.decks = [
+            createDefaultDeck()
+        ];
+    }
+
+    return storageData;
 }
 
 function isNonEmptyString(value) {
@@ -80,6 +105,61 @@ function isValidIsoDate(value) {
     }
 
     return parsedDate.toISOString() === value;
+}
+
+function isValidStoredDeck(deck) {
+    if (
+        deck === null ||
+        typeof deck !== "object" ||
+        Array.isArray(deck)
+    ) {
+        return false;
+    }
+
+    if (
+        typeof deck.name !== "string"
+    ) {
+        return false;
+    }
+
+    const trimmedName =
+        deck.name.trim();
+
+    const hasValidName =
+        trimmedName !== "" &&
+        deck.name === trimmedName &&
+        Array.from(trimmedName).length <=
+            MAX_DECK_NAME_LENGTH;
+
+    const hasValidDates =
+        isValidIsoDate(
+            deck.created_at
+        ) &&
+        isValidIsoDate(
+            deck.updated_at
+        );
+
+    if (!hasValidDates) {
+        return false;
+    }
+
+    const creationTime =
+        new Date(
+            deck.created_at
+        ).getTime();
+
+    const updateTime =
+        new Date(
+            deck.updated_at
+        ).getTime();
+
+    return (
+        isNonEmptyString(deck.id) &&
+        hasValidName &&
+        typeof deck.is_default ===
+            "boolean" &&
+        updateTime >= creationTime
+    );
 }
 
 function isValidCardInput(cardInput) {
@@ -261,29 +341,107 @@ function isValidCardStorage(
         return false;
     }
 
-    if (!Array.isArray(storageData.cards)) {
+    if (
+        !Array.isArray(
+            storageData.cards
+        )
+    ) {
         return false;
     }
 
     const allCardsAreValid =
         storageData.cards.every(
-            (card) => isValidStoredCard(card)
+            (card) =>
+                isValidStoredCard(card)
         );
 
     if (!allCardsAreValid) {
         return false;
     }
 
-    const cardIds = storageData.cards.map(
-        (card) => card.id
-    );
+    const cardIds =
+        storageData.cards.map(
+            (card) => card.id
+        );
 
     const uniqueCardIds =
         new Set(cardIds);
 
-    return (
-        uniqueCardIds.size === cardIds.length
-    );
+    if (
+        uniqueCardIds.size !==
+        cardIds.length
+    ) {
+        return false;
+    }
+
+    if (
+        expectedSchemaVersion === 1
+    ) {
+        return true;
+    }
+
+    if (
+        expectedSchemaVersion !== 2
+    ) {
+        return false;
+    }
+
+    if (
+        !Array.isArray(
+            storageData.decks
+        )
+    ) {
+        return false;
+    }
+
+    const allDecksAreValid =
+        storageData.decks.every(
+            (deck) =>
+                isValidStoredDeck(deck)
+        );
+
+    if (!allDecksAreValid) {
+        return false;
+    }
+
+    const deckIds =
+        storageData.decks.map(
+            (deck) => deck.id
+        );
+
+    const uniqueDeckIds =
+        new Set(deckIds);
+
+    if (
+        uniqueDeckIds.size !==
+        deckIds.length
+    ) {
+        return false;
+    }
+
+    const defaultDecks =
+        storageData.decks.filter(
+            (deck) =>
+                deck.is_default === true
+        );
+
+    if (
+        defaultDecks.length !== 1 ||
+        defaultDecks[0].id !==
+            DEFAULT_DECK_ID
+    ) {
+        return false;
+    }
+
+    const everyCardHasDeck =
+        storageData.cards.every(
+            (card) =>
+                uniqueDeckIds.has(
+                    card.deck_id
+                )
+        );
+
+    return everyCardHasDeck;
 }
 
 function readRawCardStorage() {
