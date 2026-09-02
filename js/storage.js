@@ -1130,6 +1130,65 @@ function getCards() {
     return result.cards;
 }
 
+function getDecksResult() {
+    const readResult =
+        readCardStorageResult();
+
+    if (
+        readResult.status ===
+            CARD_STORAGE_READ_STATUS.OK ||
+        readResult.status ===
+            CARD_STORAGE_READ_STATUS.EMPTY
+    ) {
+        return {
+            success: true,
+            status: readResult.status,
+            decks: [
+                ...readResult.storage.decks
+            ],
+            error: null
+        };
+    }
+
+    return {
+        success: false,
+        status: readResult.status,
+        decks: [],
+        error:
+            typeof readResult.error ===
+            "string"
+                ? readResult.error
+                : "Card storage could not be read safely."
+    };
+}
+
+function getDecks() {
+    const result =
+        getDecksResult();
+
+    return result.decks;
+}
+
+function getDeckById(deckId) {
+    if (!isNonEmptyString(deckId)) {
+        return null;
+    }
+
+    const decks = getDecks();
+
+    const matchingDeck =
+        decks.find(
+            (deck) =>
+                deck.id === deckId
+        );
+
+    if (matchingDeck === undefined) {
+        return null;
+    }
+
+    return matchingDeck;
+}
+
 function getCardById(cardId) {
     if (!isNonEmptyString(cardId)) {
         return null;
@@ -1391,6 +1450,9 @@ window.poofStorage = {
     getCards,
     getCardsResult,
     getCardById,
+    getDecks,
+    getDecksResult,
+    getDeckById,
     addCard,
     updateCard,
     deleteCard,
