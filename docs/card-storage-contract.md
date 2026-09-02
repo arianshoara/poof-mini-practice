@@ -330,7 +330,9 @@ The Card references themselves remain:
 For a migrated non-default Deck:
 
 - Its `id` must preserve the original legacy `deck_id`.
-- Its initial visible name uses the trimmed legacy `deck_id`.
+- Its initial visible name uses the trimmed legacy `deck_id` when that name is 80 Unicode code points or fewer.
+- If the trimmed legacy `deck_id` exceeds 80 Unicode code points, the initial visible name uses only the first 80 Unicode code points.
+- Truncating the visible name must not change the preserved legacy Deck `id`.
 - It uses `is_default: false`.
 - Migration assigns valid ISO timestamps to `created_at` and `updated_at`.
 
