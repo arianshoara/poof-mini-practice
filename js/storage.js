@@ -537,6 +537,99 @@ function getCardStorageSchemaVersion(storageData) {
     return schemaVersion;
 }
 
+function createLegacyDeckName(
+    legacyDeckId
+) {
+    return Array.from(
+        legacyDeckId.trim()
+    )
+        .slice(
+            0,
+            MAX_DECK_NAME_LENGTH
+        )
+        .join("");
+}
+
+function migrateCardStorageV1ToV2(
+    storageData
+) {
+    if (
+        !isValidCardStorage(
+            storageData,
+            1
+        )
+    ) {
+        throw new Error(
+            "Schema version 1 storage is invalid."
+        );
+    }
+
+    const migrationTime =
+        new Date().toISOString();
+
+    const decks = [
+        createDefaultDeck(
+            migrationTime
+        )
+    ];
+
+    const seenDeckIds =
+        new Set([
+            DEFAULT_DECK_ID
+        ]);
+
+    storageData.cards.forEach(
+        (card) => {
+            if (
+                seenDeckIds.has(
+                    card.deck_id
+                )
+            ) {
+                return;
+            }
+
+            seenDeckIds.add(
+                card.deck_id
+            );
+
+            decks.push({
+                id: card.deck_id,
+                name:
+                    createLegacyDeckName(
+                        card.deck_id
+                    ),
+                is_default: false,
+                created_at:
+                    migrationTime,
+                updated_at:
+                    migrationTime
+            });
+        }
+    );
+
+    const migratedStorage = {
+        schema_version: 2,
+        cards: storageData.cards,
+        decks
+    };
+
+    if (
+        !isValidCardStorage(
+            migratedStorage,
+            2
+        )
+    ) {
+        throw new Error(
+            "Migrated schema version 2 storage is invalid."
+        );
+    }
+
+    return migratedStorage;
+}
+
+CARD_STORAGE_MIGRATIONS[1] =
+    migrateCardStorageV1ToV2;
+
 function migrateCardStorage(
     storageData,
     fromVersion,
