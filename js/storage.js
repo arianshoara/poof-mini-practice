@@ -107,6 +107,21 @@ function isValidIsoDate(value) {
     return parsedDate.toISOString() === value;
 }
 
+function isValidDeckNameInput(deckName) {
+    if (typeof deckName !== "string") {
+        return false;
+    }
+
+    const trimmedName =
+        deckName.trim();
+
+    return (
+        trimmedName !== "" &&
+        Array.from(trimmedName).length <=
+            MAX_DECK_NAME_LENGTH
+    );
+}
+
 function isValidStoredDeck(deck) {
     if (
         deck === null ||
@@ -255,6 +270,28 @@ function isValidStoredCard(card) {
         hasValidSourceId &&
         hasValidSourceText &&
         updateTime >= creationTime
+    );
+}
+
+function createDeckId() {
+    if (
+        typeof crypto !== "undefined" &&
+        typeof crypto.randomUUID ===
+            "function"
+    ) {
+        return (
+            "deck_" +
+            crypto.randomUUID()
+        );
+    }
+
+    return (
+        "deck_" +
+        Date.now() +
+        "_" +
+        Math.random()
+            .toString(16)
+            .slice(2)
     );
 }
 
@@ -1189,6 +1226,82 @@ function getDeckById(deckId) {
     return matchingDeck;
 }
 
+function addDeck(deckInput) {
+    if (
+        deckInput === null ||
+        typeof deckInput !== "object" ||
+        Array.isArray(deckInput) ||
+        !isValidDeckNameInput(
+            deckInput.name
+        )
+    ) {
+        return {
+            success: false,
+            deck: null,
+            error: "Invalid deck input."
+        };
+    }
+
+    const storageData =
+        readCardStorage();
+
+    if (storageData === null) {
+        return {
+            success: false,
+            deck: null,
+            error:
+                "Card storage could not be read safely."
+        };
+    }
+
+    let deckId;
+
+    do {
+        deckId =
+            createDeckId();
+    } while (
+        storageData.decks.some(
+            (deck) =>
+                deck.id === deckId
+        )
+    );
+
+    const currentTime =
+        new Date().toISOString();
+
+    const newDeck = {
+        id: deckId,
+        name: deckInput.name.trim(),
+        is_default: false,
+        created_at: currentTime,
+        updated_at: currentTime
+    };
+
+    storageData.decks.push(
+        newDeck
+    );
+
+    const wasSaved =
+        writeCardStorage(
+            storageData
+        );
+
+    if (!wasSaved) {
+        return {
+            success: false,
+            deck: null,
+            error:
+                "Deck could not be saved."
+        };
+    }
+
+    return {
+        success: true,
+        deck: newDeck,
+        error: null
+    };
+}
+
 function getCardById(cardId) {
     if (!isNonEmptyString(cardId)) {
         return null;
@@ -1453,6 +1566,7 @@ window.poofStorage = {
     getDecks,
     getDecksResult,
     getDeckById,
+    addDeck,
     addCard,
     updateCard,
     deleteCard,
