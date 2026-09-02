@@ -132,9 +132,19 @@ Every personal card must use the following structure:
 
 ### deck_id
 
+In schema version 1:
+
 - Must be a non-empty string.
-- The first version uses `default`.
-- Real deck management will be introduced later.
+- The normal UI uses `default`.
+- The value is stored directly on the Card.
+
+Starting with schema version 2:
+
+- Must be a non-empty string.
+- Must reference the `id` of an existing Deck.
+- A Card must never reference a missing Deck.
+- Changing a Deck name must not change Card `deck_id` values.
+- Moving a Card between Decks changes only its `deck_id`.
 
 ### source_type
 
@@ -170,6 +180,172 @@ A manually created card uses:
 - Must use an ISO date string.
 
 ---
+
+---
+
+## Planned Schema Version 2 — Deck Foundation
+
+Schema version 2 introduces real Deck entities.
+
+The persisted structure will become:
+
+    {
+      "schema_version": 2,
+      "cards": [],
+      "decks": []
+    }
+
+The application must not switch to schema version 2 until the migration and validation logic are implemented and tested.
+
+### Deck Structure
+
+Every Deck uses this structure:
+
+    {
+      "id": "deck_example",
+      "name": "German B1",
+      "is_default": false,
+      "created_at": "2026-08-20T10:00:00.000Z",
+      "updated_at": "2026-08-20T10:00:00.000Z"
+    }
+
+### Deck id
+
+- Must be a non-empty string.
+- Must be unique inside `decks`.
+- Identifies one Deck.
+- Must not change after the Deck is created.
+- New user-created Decks receive an automatically generated ID.
+- A Deck ID must not be generated from the Deck name.
+- The Default Deck uses the stable ID `default`.
+
+### Deck name
+
+- Is chosen by the user.
+- May contain normal Unicode text, including Persian, German characters, spaces, symbols, and emoji.
+- Leading and trailing whitespace must be removed before storage.
+- Must remain non-empty after trimming.
+- Must not exceed 80 characters.
+- Does not identify the Deck.
+- May be changed without changing the Deck ID.
+- Duplicate Deck names are allowed because Deck identity is determined by `id`.
+
+### is_default
+
+Exactly one Deck must be the Default Deck.
+
+The Default Deck must use:
+
+    id: default
+    is_default: true
+
+All other Decks must use:
+
+    is_default: false
+
+The Default Deck:
+
+- Must always exist.
+- May be renamed by the user.
+- Must not be deleted.
+
+Renaming the Default Deck changes only its visible `name`.
+
+Its stable ID remains:
+
+    default
+
+### created_at
+
+- Must contain the Deck creation time.
+- Must use an ISO date string.
+
+### updated_at
+
+- Must contain the last Deck update time.
+- Must use an ISO date string.
+- Must not be earlier than `created_at`.
+
+### Card and Deck Relationship
+
+Every Card must reference exactly one existing Deck through:
+
+    card.deck_id
+
+The referenced value must match:
+
+    deck.id
+
+A stored Card with a `deck_id` that does not exist in `decks` makes the storage structure invalid.
+
+Changing a Deck name must not require rewriting its Cards.
+
+### Deck Deletion Rules
+
+The Default Deck must not be deleted.
+
+A non-default Deck may be deleted only when no Cards reference its ID.
+
+If Cards still reference the Deck, deletion must fail without modifying the Deck or the Cards.
+
+The application must not silently move Cards to another Deck during deletion.
+
+The user must move those Cards first and then delete the empty Deck.
+
+### Migration from Schema Version 1 to Version 2
+
+Migration must preserve every valid Card from schema version 1.
+
+The migration must always create a real Default Deck:
+
+    id: default
+    name: Default Deck
+    is_default: true
+
+Existing Cards using:
+
+    deck_id: default
+
+must keep the same `deck_id`.
+
+For every distinct non-default `deck_id` already present in valid schema version 1 Cards, migration must create one corresponding Deck.
+
+For example, if schema version 1 contains:
+
+    card A → deck_id: default
+    card B → deck_id: german
+    card C → deck_id: german
+
+schema version 2 must contain Decks representing:
+
+    default
+    german
+
+The Card references themselves remain:
+
+    card A → default
+    card B → german
+    card C → german
+
+For a migrated non-default Deck:
+
+- Its `id` must preserve the original legacy `deck_id`.
+- Its initial visible name uses the trimmed legacy `deck_id`.
+- It uses `is_default: false`.
+- Migration assigns valid ISO timestamps to `created_at` and `updated_at`.
+
+This prevents migration from discarding legacy Deck references that were valid under schema version 1.
+
+After migration:
+
+- Every Card from version 1 must still exist.
+- Every Card must reference an existing Deck.
+- Exactly one Default Deck must exist.
+- Deck IDs must be unique.
+- Card IDs must remain unchanged.
+- Card `created_at` values must remain unchanged.
+
+If these conditions are not satisfied, migration must fail instead of writing the migrated Storage.
 
 ## Storage Operations
 
