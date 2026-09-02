@@ -4,7 +4,7 @@ const CARD_STORAGE_KEY =
 const CARD_STORAGE_BACKUP_KEY =
     "poof-mini-card-storage-backup";
 
-const CURRENT_CARD_SCHEMA_VERSION = 1;
+const CURRENT_CARD_SCHEMA_VERSION = 2;
 
 const DEFAULT_DECK_ID = "default";
 const DEFAULT_DECK_NAME = "Default Deck";
