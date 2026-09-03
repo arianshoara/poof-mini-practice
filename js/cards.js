@@ -44,6 +44,21 @@ const savedCardDeckFilter =
         "saved-card-deck-filter"
     );
 
+const toggleNewDeckButton =
+    document.getElementById(
+        "toggle-new-deck-button"
+    );
+
+const toggleDeckActionsButton =
+    document.getElementById(
+        "toggle-deck-actions-button"
+    );
+
+const deckActionsPanel =
+    document.getElementById(
+        "deck-actions-panel"
+    );
+
 const newDeckForm =
     document.getElementById(
         "new-deck-form"
@@ -316,6 +331,73 @@ function setRenameDeckMessage(
     }
 }
 
+function setNewDeckPanelOpen(
+    isOpen
+) {
+    newDeckForm.hidden =
+        !isOpen;
+
+    toggleNewDeckButton.setAttribute(
+        "aria-expanded",
+        String(isOpen)
+    );
+
+    if (isOpen) {
+        setDeckActionsPanelOpen(
+            false
+        );
+
+        newDeckNameInput.focus();
+    }
+}
+
+function setDeckActionsPanelOpen(
+    isOpen
+) {
+    deckActionsPanel.hidden =
+        !isOpen;
+
+    toggleDeckActionsButton.setAttribute(
+        "aria-expanded",
+        String(isOpen)
+    );
+
+    if (isOpen) {
+        setNewDeckPanelOpen(
+            false
+        );
+
+        if (
+            !renameDeckNameInput.disabled
+        ) {
+            renameDeckNameInput.focus();
+        }
+    }
+}
+
+function closeDeckManagementPanels() {
+    setNewDeckPanelOpen(false);
+    setDeckActionsPanelOpen(false);
+}
+
+function handleNewDeckPanelToggle() {
+    setNewDeckPanelOpen(
+        newDeckForm.hidden
+    );
+}
+
+function handleDeckActionsToggle() {
+    if (
+        toggleDeckActionsButton.disabled
+    ) {
+        return;
+    }
+
+    setDeckActionsPanelOpen(
+        deckActionsPanel.hidden
+    );
+}
+
 function renderActiveDeckManagement() {
     setRenameDeckMessage("");
 
@@ -335,6 +417,11 @@ function renderActiveDeckManagement() {
 
         deleteActiveDeckButton.disabled =
             true;
+
+        toggleDeckActionsButton.disabled =
+            true;
+        
+        setDeckActionsPanelOpen(false);
 
         return false;
     }
@@ -358,6 +445,11 @@ function renderActiveDeckManagement() {
         deleteActiveDeckButton.disabled =
             true;
 
+        toggleDeckActionsButton.disabled =
+            true;
+        
+        setDeckActionsPanelOpen(false);
+
         return false;
     }
 
@@ -375,6 +467,9 @@ function renderActiveDeckManagement() {
 
     deleteActiveDeckButton.disabled =
     activeDeck.is_default === true;
+
+    toggleDeckActionsButton.disabled =
+    false;
 
     return true;
 }
@@ -1144,6 +1239,8 @@ function handleRenameDeckSubmit(
             "is-error"
         );
 
+        setDeckActionsPanelOpen(false);
+
         return;
     }
 
@@ -1215,6 +1312,8 @@ function handleNewDeckSubmit(
                 "The deck could not be created.",
             "is-error"
         );
+
+        setNewDeckPanelOpen(false);
 
         return;
     }
@@ -1297,6 +1396,8 @@ function handleSavedCardDeckFilter(
         savedCardDeckId
     );
 
+    closeDeckManagementPanels();
+
     window.dispatchEvent(
             new CustomEvent(
                 "poof:active-deck-changed",
@@ -1359,6 +1460,16 @@ confirmDeleteCardButton.addEventListener(
 deleteCardDialog.addEventListener(
     "close",
     resetDeleteCardDialog
+);
+
+toggleNewDeckButton.addEventListener(
+    "click",
+    handleNewDeckPanelToggle
+);
+
+toggleDeckActionsButton.addEventListener(
+    "click",
+    handleDeckActionsToggle
 );
 
 newDeckForm.addEventListener(
