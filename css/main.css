@@ -416,6 +416,57 @@ h1,
 }
 
 /* =========================================================
+   CARD BUILDER TOGGLE
+   ========================================================= */
+
+.card-builder-toggle-wrap {
+    display: flex;
+    justify-content: flex-end;
+
+    max-width: 720px;
+    margin: 28px auto 0;
+}
+
+.card-builder-toggle {
+    padding: 10px 14px;
+
+    color: var(--color-accent);
+    background-color: transparent;
+
+    border: 1px solid var(--color-accent);
+    border-radius: 12px;
+
+    font: inherit;
+    font-weight: bold;
+
+    cursor: pointer;
+}
+
+.card-builder-toggle:hover {
+    color: var(--color-background);
+    background-color: var(--color-accent);
+}
+
+.card-builder-toggle:active {
+    transform: scale(0.98);
+}
+
+.card-builder-toggle:focus-visible {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 3px;
+}
+
+.card-builder[hidden] {
+    display: none;
+}
+
+@media (max-width: 480px) {
+    .card-builder-toggle {
+        width: 100%;
+    }
+}
+
+/* =========================================================
    CARD BUILDER
    ========================================================= */
 
