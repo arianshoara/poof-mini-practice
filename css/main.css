@@ -826,6 +826,47 @@ h1,
 }
 
 /* =========================================================
+   DECK CREATE FORM
+   ========================================================= */
+
+.deck-create-form {
+    margin: 0 0 18px;
+}
+
+.deck-create-form__controls {
+    display: flex;
+    align-items: stretch;
+    gap: 10px;
+}
+
+.deck-create-form__controls
+.saved-card-search__input {
+    flex: 1;
+    min-width: 0;
+}
+
+.deck-create-form__controls
+.card-builder__submit {
+    flex: 0 0 auto;
+}
+
+.deck-create-form
+.card-builder__message {
+    margin-top: 8px;
+}
+
+@media (max-width: 480px) {
+    .deck-create-form__controls {
+        flex-direction: column;
+    }
+
+    .deck-create-form__controls
+    .card-builder__submit {
+        width: 100%;
+    }
+}
+
+/* =========================================================
    SAVED CARD SEARCH
    ========================================================= */
 
