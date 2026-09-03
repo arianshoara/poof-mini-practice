@@ -39,8 +39,19 @@ const savedCardSortSelect =
         "saved-card-sort-select"
     );
 
+const savedCardDeckFilter =
+    document.getElementById(
+        "saved-card-deck-filter"
+    );
+
 const SAVED_CARD_SORT_STORAGE_KEY =
     "poof-saved-card-sort";
+
+const SAVED_CARD_DECK_STORAGE_KEY =
+    "poof-active-deck-id";
+
+const ALL_DECKS_FILTER_VALUE =
+    "all";
 
 const SAVED_CARD_SORT_MODES = [
     "newest",
@@ -80,11 +91,143 @@ function saveSavedCardSortMode(sortMode) {
     );
 }
 
+function getSavedCardDeckId() {
+    const savedDeckId =
+        localStorage.getItem(
+            SAVED_CARD_DECK_STORAGE_KEY
+        );
+
+    if (
+        typeof savedDeckId ===
+            "string" &&
+        savedDeckId !== ""
+    ) {
+        return savedDeckId;
+    }
+
+    return ALL_DECKS_FILTER_VALUE;
+}
+
+function saveSavedCardDeckId(
+    deckId
+) {
+    localStorage.setItem(
+        SAVED_CARD_DECK_STORAGE_KEY,
+        deckId
+    );
+}
+
 let savedCardSortMode =
     getSavedCardSortMode();
 
 savedCardSortSelect.value =
     savedCardSortMode;
+
+let savedCardDeckId =
+    getSavedCardDeckId();
+
+function renderSavedCardDeckFilter() {
+    const decksResult =
+        window.poofStorage
+            .getDecksResult();
+
+    savedCardDeckFilter
+        .replaceChildren();
+
+    if (!decksResult.success) {
+        const unavailableOption =
+            document.createElement(
+                "option"
+            );
+
+        unavailableOption.value = "";
+        unavailableOption.textContent =
+            "Decks unavailable";
+
+        savedCardDeckFilter.append(
+            unavailableOption
+        );
+
+        savedCardDeckFilter.disabled =
+            true;
+
+        return false;
+    }
+
+    const allDecksOption =
+        document.createElement(
+            "option"
+        );
+
+    allDecksOption.value =
+        ALL_DECKS_FILTER_VALUE;
+
+    allDecksOption.textContent =
+        "All Decks";
+
+    savedCardDeckFilter.append(
+        allDecksOption
+    );
+
+    decksResult.decks.forEach(
+        (deck) => {
+            const option =
+                document.createElement(
+                    "option"
+                );
+
+            option.value = deck.id;
+            option.textContent =
+                deck.name;
+
+            savedCardDeckFilter.append(
+                option
+            );
+        }
+    );
+
+    const savedDeckStillExists =
+        savedCardDeckId ===
+            ALL_DECKS_FILTER_VALUE ||
+        decksResult.decks.some(
+            (deck) =>
+                deck.id ===
+                savedCardDeckId
+        );
+
+    if (!savedDeckStillExists) {
+        savedCardDeckId =
+            ALL_DECKS_FILTER_VALUE;
+
+        saveSavedCardDeckId(
+            savedCardDeckId
+        );
+    }
+
+    savedCardDeckFilter.value =
+        savedCardDeckId;
+
+    savedCardDeckFilter.disabled =
+        false;
+
+    return true;
+}
+
+function cardMatchesActiveDeck(
+    card
+) {
+    if (
+        savedCardDeckId ===
+        ALL_DECKS_FILTER_VALUE
+    ) {
+        return true;
+    }
+
+    return (
+        card.deck_id ===
+        savedCardDeckId
+    );
+}
 
 let pendingDeleteCardId = null;
 let savedCardSearchQuery = "";
@@ -382,9 +525,16 @@ function renderSavedCards() {
 
     const cards = result.cards;
 
-    updateSavedCardsCount(cards);
-
-    if (cards.length === 0) {
+        const deckCards =
+            cards.filter(
+                cardMatchesActiveDeck
+            );
+        
+        updateSavedCardsCount(
+            deckCards
+        );
+        
+        if (deckCards.length === 0) {
         const emptyMessage =
             document.createElement("p");
 
@@ -392,8 +542,9 @@ function renderSavedCards() {
             "saved-card-list__empty";
 
         emptyMessage.textContent =
-            "Create your first vocabulary card.";
-
+            cards.length === 0
+                ? "Create your first vocabulary card."
+                : "No cards in this deck yet.";
         savedCardList.replaceChildren(
             emptyMessage
         );
@@ -402,7 +553,7 @@ function renderSavedCards() {
     }
 
     const matchingCards =
-            cards.filter((card) =>
+            deckCards.filter((card) =>
                 cardMatchesSearch(
                     card,
                     savedCardSearchQuery
@@ -668,6 +819,45 @@ function handleSavedCardSearch(event) {
     renderSavedCards();
 }
 
+function handleSavedCardDeckFilter(
+    event
+) {
+    const nextDeckId =
+        event.target.value;
+
+    const decksResult =
+        window.poofStorage
+            .getDecksResult();
+
+    if (!decksResult.success) {
+        return;
+    }
+
+    const isValidDeckSelection =
+        nextDeckId ===
+            ALL_DECKS_FILTER_VALUE ||
+        decksResult.decks.some(
+            (deck) =>
+                deck.id ===
+                nextDeckId
+        );
+
+    if (!isValidDeckSelection) {
+        renderSavedCardDeckFilter();
+
+        return;
+    }
+
+    savedCardDeckId =
+        nextDeckId;
+
+    saveSavedCardDeckId(
+        savedCardDeckId
+    );
+
+    renderSavedCards();
+}
+
 function handleSavedCardSort(event) {
     const nextSortMode =
         event.target.value;
@@ -716,6 +906,11 @@ deleteCardDialog.addEventListener(
     resetDeleteCardDialog
 );
 
+savedCardDeckFilter.addEventListener(
+    "change",
+    handleSavedCardDeckFilter
+);
+
 savedCardSearchInput.addEventListener(
     "input",
     handleSavedCardSearch
@@ -727,4 +922,5 @@ savedCardSortSelect.addEventListener(
 );
 
 
+renderSavedCardDeckFilter();
 renderSavedCards();
