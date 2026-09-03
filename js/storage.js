@@ -1544,6 +1544,30 @@ function getCardById(cardId) {
     return matchingCard;
 }
 
+function storageHasDeck(
+    storageData,
+    deckId
+) {
+    if (
+        storageData === null ||
+        !Array.isArray(
+            storageData.decks
+        ) ||
+        !isNonEmptyString(deckId)
+    ) {
+        return false;
+    }
+
+    const normalizedDeckId =
+        deckId.trim();
+
+    return storageData.decks.some(
+        (deck) =>
+            deck.id ===
+            normalizedDeckId
+    );
+}
+
 function addCard(cardInput) {
     if (!isValidCardInput(cardInput)) {
         console.error(
@@ -1565,6 +1589,24 @@ function addCard(cardInput) {
                 card: null,
                 error:
                     "Card storage could not be read safely."
+            };
+        }
+
+    const targetDeckId =
+            cardInput.deck_id === undefined
+                ? DEFAULT_DECK_ID
+                : cardInput.deck_id.trim();
+        
+        if (
+            !storageHasDeck(
+                storageData,
+                targetDeckId
+            )
+        ) {
+            return {
+                success: false,
+                card: null,
+                error: "Deck not found."
             };
         }
 
@@ -1685,6 +1727,19 @@ function updateCard(cardId, changes) {
 
     updatedCard.deck_id =
         updatedCard.deck_id.trim();
+
+    if (
+            !storageHasDeck(
+                storageData,
+                updatedCard.deck_id
+            )
+        ) {
+            return {
+                success: false,
+                card: null,
+                error: "Deck not found."
+            };
+        }
 
     if (
         typeof updatedCard.dictionary_entry_id ===
