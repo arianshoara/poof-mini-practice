@@ -150,6 +150,44 @@
                 </select>
             </div>
 
+            <form
+                id="new-deck-form"
+                class="deck-create-form"
+            >
+                <label
+                    class="saved-card-search__label"
+                    for="new-deck-name"
+                >
+                    Create deck
+                </label>
+            
+                <div class="deck-create-form__controls">
+                    <input
+                        id="new-deck-name"
+                        class="saved-card-search__input"
+                        type="text"
+                        maxlength="80"
+                        placeholder="Deck name"
+                        autocomplete="off"
+                        required
+                    >
+            
+                    <button
+                        id="create-deck-button"
+                        class="card-builder__submit"
+                        type="submit"
+                    >
+                        + New Deck
+                    </button>
+                </div>
+            
+                <p
+                    id="new-deck-message"
+                    class="card-builder__message"
+                    aria-live="polite"
+                ></p>
+            </form>
+
             <div class="saved-card-search">
                   <label
                       class="saved-card-search__label"
