@@ -153,6 +153,7 @@
             <form
                 id="new-deck-form"
                 class="deck-create-form"
+                hidden
             >
                 <label
                     class="saved-card-search__label"
@@ -188,6 +189,12 @@
                 ></p>
             </form>
 
+            <div
+                id="deck-actions-panel"
+                class="deck-actions-panel"
+                hidden
+            >
+        
             <form
                 id="rename-deck-form"
                 class="deck-create-form"
@@ -226,7 +233,7 @@
                 ></p>
             </form>
 
-            <div class="deck-create-form">
+           <div class="deck-create-form">
                 <button
                     id="delete-active-deck-button"
                     class="saved-card__delete"
@@ -234,6 +241,7 @@
                 >
                     Delete active deck
                 </button>
+            </div>
             </div>
 
             <div class="saved-card-search">
@@ -253,30 +261,48 @@
                   >
               </div>
 
-            <div class="saved-card-sort">
-                <label
-                    class="saved-card-sort__label"
-                    for="saved-card-sort-select"
-                >
-                    Sort cards
-                </label>
+<div class="deck-toolbar">
+    <label
+        class="saved-card-sort__label"
+        for="saved-card-deck-filter"
+    >
+        Deck
+    </label>
+
+    <div class="deck-toolbar__controls">
+                    <select
+                        id="saved-card-deck-filter"
+                        class="saved-card-sort__select deck-toolbar__select"
+                    >
+                        <option value="all">
+                            All Decks
+                        </option>
+                    </select>
             
-                <select
-                    id="saved-card-sort-select"
-                    class="saved-card-sort__select"
-                >
-                    <option value="newest">
-                        Newest first
-                    </option>
+                    <button
+                        id="toggle-new-deck-button"
+                        class="deck-toolbar__button"
+                        type="button"
+                        aria-label="Create a new deck"
+                        title="New deck"
+                        aria-expanded="false"
+                        aria-controls="new-deck-form"
+                    >
+                        +
+                    </button>
             
-                    <option value="oldest">
-                        Oldest first
-                    </option>
-            
-                    <option value="alphabetical">
-                        Alphabetical
-                    </option>
-                </select>
+                    <button
+                        id="toggle-deck-actions-button"
+                        class="deck-toolbar__button"
+                        type="button"
+                        aria-label="Manage active deck"
+                        title="Deck options"
+                        aria-expanded="false"
+                        aria-controls="deck-actions-panel"
+                    >
+                        ⋯
+                    </button>
+                </div>
             </div>
         
             <div
