@@ -855,6 +855,18 @@ function handleSavedCardDeckFilter(
         savedCardDeckId
     );
 
+    window.dispatchEvent(
+            new CustomEvent(
+                "poof:active-deck-changed",
+                {
+                    detail: {
+                        deckId:
+                            savedCardDeckId
+                    }
+                }
+            )
+        );
+
     renderSavedCards();
 }
 
