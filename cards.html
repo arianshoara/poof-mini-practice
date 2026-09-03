@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script src="js/theme.js"></script>
+  <link rel="stylesheet" href="css/themes.css">
+  <link rel="stylesheet" href="css/main.css">
+  <script src="js/navigation.js" defer></script>
+  <script src="js/storage.js" defer></script>
+  <script src="js/cards.js" defer></script>
+  <script src="js/card-builder.js" defer></script>
+  <title>POOF Mini Practice | Cards</title>
+</head>
+
+<body>
+  <header>
+    <h1>POOF Mini Practice</h1>
+    <p>A small practice project for understanding how POOF works.</p>
+  </header>
+
+  <nav id="main-navigation"></nav>
+
+  <main>
+    <h2>Cards</h2>
+    <p>Your saved vocabulary cards will appear here.</p>
+
+              <section
+            class="card-builder"
+            aria-labelledby="card-builder-title"
+        >
+            <h3 id="card-builder-title">
+                Create a card
+            </h3>
+        
+            <form id="card-builder-form">
+                <div class="card-builder__field card-builder__field--wide">
+                    <label for="card-word">
+                        Word
+                    </label>
+        
+                    <input
+                        id="card-word"
+                        name="word"
+                        type="text"
+                        lang="de"
+                        maxlength="120"
+                        autocomplete="off"
+                        required
+                    >
+                </div>
+        
+                <div class="card-builder__field">
+                    <label for="card-meaning">
+                        Meaning
+                    </label>
+        
+                    <input
+                        id="card-meaning"
+                        name="meaning"
+                        type="text"
+                        dir="auto"
+                        maxlength="200"
+                        autocomplete="off"
+                        required
+                    >
+                </div>
+        
+                <div class="card-builder__field">
+                    <label for="card-example">
+                        Example
+                    </label>
+        
+                    <textarea
+                        id="card-example"
+                        name="example"
+                        lang="de"
+                        dir="auto"
+                        rows="3"
+                        maxlength="400"
+                    ></textarea>
+                </div>
+        
+                <div class="card-builder__field">
+                    <label for="card-deck">
+                        Deck
+                    </label>
+        
+                    <select
+                        id="card-deck"
+                        name="deck_id"
+                    >
+                        <option value="default">
+                            Default deck
+                        </option>
+                    </select>
+                </div>
+        
+                <button
+                    class="card-builder__submit"
+                    type="submit"
+                >
+                    Save card
+                </button>
+
+                <button
+                    id="card-builder-cancel"
+                    class="card-builder__cancel"
+                    type="button"
+                    hidden
+                >
+                    Cancel edit
+                </button>
+        
+                <p
+                    id="card-builder-message"
+                    class="card-builder__message"
+                    aria-live="polite"
+                ></p>
+            </form>
+        </section>
+      
+      <section
+            class="cards-summary"
+            aria-labelledby="saved-cards-title"
+        >
+            <h3 id="saved-cards-title">
+                Saved cards
+            </h3>
+        
+            <p id="saved-cards-count">
+                No cards saved yet.
+            </p>
+
+            <div class="deck-toolbar">
+                <label
+                    class="saved-card-sort__label"
+                    for="saved-card-deck-filter"
+                >
+                    Deck
+                </label>
+
+                <div class="deck-toolbar__controls">
+                    <select
+                        id="saved-card-deck-filter"
+                        class="saved-card-sort__select deck-toolbar__select"
+                    >
+                        <option value="all">
+                            All Decks
+                        </option>
+                    </select>
+
+                    <button
+                        id="toggle-new-deck-button"
+                        class="deck-toolbar__button"
+                        type="button"
+                        aria-label="Create a new deck"
+                        title="New deck"
+                        aria-expanded="false"
+                        aria-controls="new-deck-form"
+                    >
+                        +
+                    </button>
+
+                    <button
+                        id="toggle-deck-actions-button"
+                        class="deck-toolbar__button"
+                        type="button"
+                        aria-label="Manage active deck"
+                        title="Deck options"
+                        aria-expanded="false"
+                        aria-controls="deck-actions-panel"
+                    >
+                        ⋯
+                    </button>
+                </div>
+            </div>
+
+            <form
+                id="new-deck-form"
+                class="deck-create-form"
+                hidden
+            >
+                <label
+                    class="saved-card-search__label"
+                    for="new-deck-name"
+                >
+                    Create deck
+                </label>
+
+                <div class="deck-create-form__controls">
+                    <input
+                        id="new-deck-name"
+                        class="saved-card-search__input"
+                        type="text"
+                        maxlength="80"
+                        placeholder="Deck name"
+                        autocomplete="off"
+                        required
+                    >
+
+                    <button
+                        id="create-deck-button"
+                        class="card-builder__submit"
+                        type="submit"
+                    >
+                        + New Deck
+                    </button>
+                </div>
+
+                <p
+                    id="new-deck-message"
+                    class="card-builder__message"
+                    aria-live="polite"
+                ></p>
+            </form>
+
+            <div
+                id="deck-actions-panel"
+                class="deck-actions-panel"
+                hidden
+            >
+                <form
+                    id="rename-deck-form"
+                    class="deck-create-form"
+                >
+                    <label
+                        class="saved-card-search__label"
+                        for="rename-deck-name"
+                    >
+                        Rename active deck
+                    </label>
+
+                    <div class="deck-create-form__controls">
+                        <input
+                            id="rename-deck-name"
+                            class="saved-card-search__input"
+                            type="text"
+                            maxlength="80"
+                            placeholder="Select a deck first"
+                            autocomplete="off"
+                            required
+                        >
+
+                        <button
+                            id="rename-deck-button"
+                            class="card-builder__submit"
+                            type="submit"
+                        >
+                            Rename
+                        </button>
+                    </div>
+
+                    <p
+                        id="rename-deck-message"
+                        class="card-builder__message"
+                        aria-live="polite"
+                    ></p>
+                </form>
+
+                <div class="deck-create-form">
+                    <button
+                        id="delete-active-deck-button"
+                        class="saved-card__delete"
+                        type="button"
+                    >
+                        Delete active deck
+                    </button>
+                </div>
+            </div>
+
+            <div class="saved-card-search">
+                <label
+                    class="saved-card-search__label"
+                    for="saved-card-search-input"
+                >
+                    Search saved cards
+                </label>
+
+                <input
+                    id="saved-card-search-input"
+                    class="saved-card-search__input"
+                    type="search"
+                    placeholder="Search by word, meaning or example..."
+                    autocomplete="off"
+                >
+            </div>
+
+            <div class="saved-card-sort">
+                <label
+                    class="saved-card-sort__label"
+                    for="saved-card-sort-select"
+                >
+                    Sort cards
+                </label>
+
+                <select
+                    id="saved-card-sort-select"
+                    class="saved-card-sort__select"
+                >
+                    <option value="newest">
+                        Newest first
+                    </option>
+                    <option value="oldest">
+                        Oldest first
+                    </option>
+                    <option value="alphabetical">
+                        A–Z
+                    </option>
+                </select>
+            </div>
+
+            <div
+                id="saved-card-list"
+                class="saved-card-list"
+                aria-live="polite"
+            ></div>
+        </section>
+    
+  </main>
+
+  <dialog
+        id="delete-card-dialog"
+        class="delete-card-dialog"
+        aria-labelledby="delete-card-dialog-title"
+    >
+        <div class="delete-card-dialog__content">
+            <h3 id="delete-card-dialog-title">
+                Delete card?
+            </h3>
+    
+            <p id="delete-card-dialog-message">
+                Are you sure you want to delete this card?
+            </p>
+    
+            <p
+                id="delete-card-dialog-error"
+                class="delete-card-dialog__error"
+                aria-live="polite"
+            ></p>
+    
+            <div class="delete-card-dialog__actions">
+                <button
+                    id="cancel-delete-card"
+                    class="delete-card-dialog__cancel"
+                    type="button"
+                >
+                    Cancel
+                </button>
+    
+                <button
+                    id="confirm-delete-card"
+                    class="delete-card-dialog__confirm"
+                    type="button"
+                >
+                    Delete
+                </button>
+            </div>
+        </div>
+    </dialog>
+
+    <dialog
+          id="delete-deck-dialog"
+          class="delete-card-dialog"
+          aria-labelledby="delete-deck-dialog-title"
+      >
+          <div class="delete-card-dialog__content">
+              <h3 id="delete-deck-dialog-title">
+                  Delete deck?
+              </h3>
+      
+              <p id="delete-deck-dialog-message">
+                  Are you sure you want to delete this deck?
+              </p>
+      
+              <p
+                  id="delete-deck-dialog-error"
+                  class="delete-card-dialog__error"
+                  aria-live="polite"
+              ></p>
+      
+              <div class="delete-card-dialog__actions">
+                  <button
+                      id="cancel-delete-deck"
+                      class="delete-card-dialog__cancel"
+                      type="button"
+                  >
+                      Cancel
+                  </button>
+      
+                  <button
+                      id="confirm-delete-deck"
+                      class="delete-card-dialog__confirm"
+                      type="button"
+                  >
+                      Delete
+                  </button>
+              </div>
+          </div>
+      </dialog>
+  
+</body>
+</html>
