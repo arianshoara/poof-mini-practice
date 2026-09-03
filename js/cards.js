@@ -44,6 +44,21 @@ const savedCardDeckFilter =
         "saved-card-deck-filter"
     );
 
+const newDeckForm =
+    document.getElementById(
+        "new-deck-form"
+    );
+
+const newDeckNameInput =
+    document.getElementById(
+        "new-deck-name"
+    );
+
+const newDeckMessage =
+    document.getElementById(
+        "new-deck-message"
+    );
+
 const SAVED_CARD_SORT_STORAGE_KEY =
     "poof-saved-card-sort";
 
@@ -211,6 +226,25 @@ function renderSavedCardDeckFilter() {
         false;
 
     return true;
+}
+
+function setNewDeckMessage(
+    message,
+    type = ""
+) {
+    newDeckMessage.textContent =
+        message;
+
+    newDeckMessage.classList.remove(
+        "is-success",
+        "is-error"
+    );
+
+    if (type) {
+        newDeckMessage.classList.add(
+            type
+        );
+    }
 }
 
 function cardMatchesActiveDeck(
@@ -819,6 +853,70 @@ function handleSavedCardSearch(event) {
     renderSavedCards();
 }
 
+function handleNewDeckSubmit(
+    event
+) {
+    event.preventDefault();
+
+    setNewDeckMessage("");
+
+    const result =
+        window.poofStorage.addDeck({
+            name:
+                newDeckNameInput.value
+        });
+
+    if (!result.success) {
+        setNewDeckMessage(
+            result.error ||
+                "The deck could not be created.",
+            "is-error"
+        );
+
+        return;
+    }
+
+    const newDeck =
+        result.deck;
+
+    newDeckForm.reset();
+
+    savedCardDeckId =
+        newDeck.id;
+
+    saveSavedCardDeckId(
+        savedCardDeckId
+    );
+
+    renderSavedCardDeckFilter();
+    renderSavedCards();
+
+    window.dispatchEvent(
+        new CustomEvent(
+            "poof:decks-changed"
+        )
+    );
+
+    window.dispatchEvent(
+        new CustomEvent(
+            "poof:active-deck-changed",
+            {
+                detail: {
+                    deckId:
+                        newDeck.id
+                }
+            }
+        )
+    );
+
+    setNewDeckMessage(
+        'Deck created: "' +
+            newDeck.name +
+            '"',
+        "is-success"
+    );
+}
+
 function handleSavedCardDeckFilter(
     event
 ) {
@@ -916,6 +1014,11 @@ confirmDeleteCardButton.addEventListener(
 deleteCardDialog.addEventListener(
     "close",
     resetDeleteCardDialog
+);
+
+newDeckForm.addEventListener(
+    "submit",
+    handleNewDeckSubmit
 );
 
 savedCardDeckFilter.addEventListener(
