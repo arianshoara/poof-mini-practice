@@ -1424,6 +1424,108 @@ function updateDeck(deckId, changes) {
     };
 }
 
+function deleteDeck(deckId) {
+    if (!isNonEmptyString(deckId)) {
+        return {
+            success: false,
+            deck: null,
+            error: "Invalid deck ID."
+        };
+    }
+
+    const storageData =
+        readCardStorage();
+
+    if (storageData === null) {
+        return {
+            success: false,
+            deck: null,
+            error:
+                "Card storage could not be read safely."
+        };
+    }
+
+    const normalizedDeckId =
+        deckId.trim();
+
+    const deckIndex =
+        storageData.decks.findIndex(
+            (deck) =>
+                deck.id ===
+                normalizedDeckId
+        );
+
+    if (deckIndex === -1) {
+        return {
+            success: false,
+            deck: null,
+            error: "Deck not found."
+        };
+    }
+
+    const deck =
+        storageData.decks[
+            deckIndex
+        ];
+
+    if (
+        deck.id === DEFAULT_DECK_ID ||
+        deck.is_default === true
+    ) {
+        return {
+            success: false,
+            deck: null,
+            error:
+                "Default deck cannot be deleted."
+        };
+    }
+
+    const hasCards =
+        storageData.cards.some(
+            (card) =>
+                card.deck_id ===
+                deck.id
+        );
+
+    if (hasCards) {
+        return {
+            success: false,
+            deck: null,
+            error:
+                "Deck cannot be deleted while it contains cards."
+        };
+    }
+
+    const deletedDecks =
+        storageData.decks.splice(
+            deckIndex,
+            1
+        );
+
+    const deletedDeck =
+        deletedDecks[0];
+
+    const wasSaved =
+        writeCardStorage(
+            storageData
+        );
+
+    if (!wasSaved) {
+        return {
+            success: false,
+            deck: null,
+            error:
+                "Deck deletion could not be saved."
+        };
+    }
+
+    return {
+        success: true,
+        deck: deletedDeck,
+        error: null
+    };
+}
+
 function getCardById(cardId) {
     if (!isNonEmptyString(cardId)) {
         return null;
@@ -1690,6 +1792,7 @@ window.poofStorage = {
     getDeckById,
     addDeck,
     updateDeck,
+    deleteDeck,
     addCard,
     updateCard,
     deleteCard,
