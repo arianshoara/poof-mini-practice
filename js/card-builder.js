@@ -1,3 +1,18 @@
+const cardBuilderSection =
+    document.getElementById(
+        "card-builder-section"
+    );
+
+const toggleCardBuilderButton =
+    document.getElementById(
+        "toggle-card-builder-button"
+    );
+
+const cardWordInput =
+    document.getElementById(
+        "card-word"
+    );
+
 const cardBuilderForm =
     document.getElementById("card-builder-form");
 
@@ -84,6 +99,39 @@ function syncCardBuilderToActiveDeck() {
 }
 
 let editingCardId = null;
+
+function setCardBuilderOpen(
+    isOpen
+) {
+    cardBuilderSection.hidden =
+        !isOpen;
+
+    toggleCardBuilderButton.setAttribute(
+        "aria-expanded",
+        String(isOpen)
+    );
+
+    toggleCardBuilderButton.textContent =
+        isOpen
+            ? "Close"
+            : "+ New Card";
+
+    if (isOpen) {
+        cardWordInput.focus();
+    }
+}
+
+function toggleCardBuilder() {
+    if (editingCardId !== null) {
+        cancelCardEditing();
+
+        return;
+    }
+
+    setCardBuilderOpen(
+        cardBuilderSection.hidden
+    );
+}
 
 function showCardBuilderMessage(message, state) {
     cardBuilderMessage.textContent = message;
@@ -278,6 +326,8 @@ function startEditingCard(event) {
         null
     );
 
+    setCardBuilderOpen(true);
+
     cardBuilderForm.scrollIntoView({
         behavior: "smooth",
         block: "center"
@@ -290,6 +340,8 @@ function startEditingCard(event) {
 
 function cancelCardEditing() {
     resetCardBuilderMode();
+
+    setCardBuilderOpen(false);
 
     showCardBuilderMessage(
         "Editing was cancelled.",
@@ -360,10 +412,14 @@ function handleCardBuilderSubmit(event) {
         new CustomEvent("poof:cards-changed")
     );
 
-    document
-        .getElementById("card-word")
-        .focus();
+    setCardBuilderOpen(false);
+    
 }
+
+toggleCardBuilderButton.addEventListener(
+    "click",
+    toggleCardBuilder
+);
 
 cardBuilderForm.addEventListener(
     "submit",
@@ -391,3 +447,4 @@ window.addEventListener(
 );
 
 renderCardDeckOptions();
+setCardBuilderOpen(false);
