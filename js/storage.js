@@ -1302,6 +1302,128 @@ function addDeck(deckInput) {
     };
 }
 
+function updateDeck(deckId, changes) {
+    if (!isNonEmptyString(deckId)) {
+        return {
+            success: false,
+            deck: null,
+            error: "Invalid deck ID."
+        };
+    }
+
+    if (
+        changes === null ||
+        typeof changes !== "object" ||
+        Array.isArray(changes)
+    ) {
+        return {
+            success: false,
+            deck: null,
+            error: "Invalid deck changes."
+        };
+    }
+
+    if (changes.name === undefined) {
+        return {
+            success: false,
+            deck: null,
+            error:
+                "No editable deck changes were provided."
+        };
+    }
+
+    if (
+        !isValidDeckNameInput(
+            changes.name
+        )
+    ) {
+        return {
+            success: false,
+            deck: null,
+            error: "Invalid deck name."
+        };
+    }
+
+    const storageData =
+        readCardStorage();
+
+    if (storageData === null) {
+        return {
+            success: false,
+            deck: null,
+            error:
+                "Card storage could not be read safely."
+        };
+    }
+
+    const normalizedDeckId =
+        deckId.trim();
+
+    const deckIndex =
+        storageData.decks.findIndex(
+            (deck) =>
+                deck.id ===
+                normalizedDeckId
+        );
+
+    if (deckIndex === -1) {
+        return {
+            success: false,
+            deck: null,
+            error: "Deck not found."
+        };
+    }
+
+    const currentDeck =
+        storageData.decks[
+            deckIndex
+        ];
+
+    const updatedDeck = {
+        ...currentDeck,
+        name: changes.name.trim(),
+        updated_at:
+            new Date().toISOString()
+    };
+
+    if (
+        !isValidStoredDeck(
+            updatedDeck
+        )
+    ) {
+        return {
+            success: false,
+            deck: null,
+            error:
+                "Updated deck data is invalid."
+        };
+    }
+
+    storageData.decks[
+        deckIndex
+    ] = updatedDeck;
+
+    const wasSaved =
+        writeCardStorage(
+            storageData
+        );
+
+    if (!wasSaved) {
+        return {
+            success: false,
+            deck: null,
+            error:
+                "Deck update could not be saved."
+        };
+    }
+
+    return {
+        success: true,
+        deck: updatedDeck,
+        error: null
+    };
+}
+
 function getCardById(cardId) {
     if (!isNonEmptyString(cardId)) {
         return null;
@@ -1567,6 +1689,7 @@ window.poofStorage = {
     getDecksResult,
     getDeckById,
     addDeck,
+    updateDeck,
     addCard,
     updateCard,
     deleteCard,
