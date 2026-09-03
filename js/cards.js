@@ -59,6 +59,26 @@ const newDeckMessage =
         "new-deck-message"
     );
 
+const renameDeckForm =
+    document.getElementById(
+        "rename-deck-form"
+    );
+
+const renameDeckNameInput =
+    document.getElementById(
+        "rename-deck-name"
+    );
+
+const renameDeckButton =
+    document.getElementById(
+        "rename-deck-button"
+    );
+
+const renameDeckMessage =
+    document.getElementById(
+        "rename-deck-message"
+    );
+
 const SAVED_CARD_SORT_STORAGE_KEY =
     "poof-saved-card-sort";
 
@@ -246,6 +266,80 @@ function setNewDeckMessage(
         );
     }
 }
+
+function setRenameDeckMessage(
+    message,
+    type = ""
+) {
+    renameDeckMessage.textContent =
+        message;
+
+    renameDeckMessage.classList.remove(
+        "is-success",
+        "is-error"
+    );
+
+    if (type) {
+        renameDeckMessage.classList.add(
+            type
+        );
+    }
+}
+
+function renderActiveDeckManagement() {
+    setRenameDeckMessage("");
+
+    if (
+        savedCardDeckId ===
+        ALL_DECKS_FILTER_VALUE
+    ) {
+        renameDeckNameInput.value = "";
+        renameDeckNameInput.placeholder =
+            "Select a deck first";
+
+        renameDeckNameInput.disabled =
+            true;
+
+        renameDeckButton.disabled =
+            true;
+
+        return false;
+    }
+
+    const activeDeck =
+        window.poofStorage.getDeckById(
+            savedCardDeckId
+        );
+
+    if (!activeDeck) {
+        renameDeckNameInput.value = "";
+        renameDeckNameInput.placeholder =
+            "Deck unavailable";
+
+        renameDeckNameInput.disabled =
+            true;
+
+        renameDeckButton.disabled =
+            true;
+
+        return false;
+    }
+
+    renameDeckNameInput.disabled =
+        false;
+
+    renameDeckButton.disabled =
+        false;
+
+    renameDeckNameInput.placeholder =
+        "Deck name";
+
+    renameDeckNameInput.value =
+        activeDeck.name;
+
+    return true;
+}
+
 
 function cardMatchesActiveDeck(
     card
@@ -853,6 +947,74 @@ function handleSavedCardSearch(event) {
     renderSavedCards();
 }
 
+function handleRenameDeckSubmit(
+    event
+) {
+    event.preventDefault();
+
+    setRenameDeckMessage("");
+
+    if (
+        savedCardDeckId ===
+        ALL_DECKS_FILTER_VALUE
+    ) {
+        setRenameDeckMessage(
+            "Select a deck first.",
+            "is-error"
+        );
+
+        return;
+    }
+
+    const result =
+        window.poofStorage.updateDeck(
+            savedCardDeckId,
+            {
+                name:
+                    renameDeckNameInput.value
+            }
+        );
+
+    if (!result.success) {
+        setRenameDeckMessage(
+            result.error ||
+                "The deck could not be renamed.",
+            "is-error"
+        );
+
+        return;
+    }
+
+    renderSavedCardDeckFilter();
+    renderActiveDeckManagement();
+    renderSavedCards();
+
+    window.dispatchEvent(
+        new CustomEvent(
+            "poof:decks-changed"
+        )
+    );
+
+    window.dispatchEvent(
+        new CustomEvent(
+            "poof:active-deck-changed",
+            {
+                detail: {
+                    deckId:
+                        savedCardDeckId
+                }
+            }
+        )
+    );
+
+    setRenameDeckMessage(
+        'Deck renamed to "' +
+            result.deck.name +
+            '"',
+        "is-success"
+    );
+}
+
 function handleNewDeckSubmit(
     event
 ) {
@@ -889,6 +1051,7 @@ function handleNewDeckSubmit(
     );
 
     renderSavedCardDeckFilter();
+    renderActiveDeckManagement();
     renderSavedCards();
 
     window.dispatchEvent(
@@ -965,6 +1128,7 @@ function handleSavedCardDeckFilter(
             )
         );
 
+    renderActiveDeckManagement();
     renderSavedCards();
 }
 
@@ -1021,6 +1185,11 @@ newDeckForm.addEventListener(
     handleNewDeckSubmit
 );
 
+renameDeckForm.addEventListener(
+    "submit",
+    handleRenameDeckSubmit
+);
+
 savedCardDeckFilter.addEventListener(
     "change",
     handleSavedCardDeckFilter
@@ -1038,4 +1207,5 @@ savedCardSortSelect.addEventListener(
 
 
 renderSavedCardDeckFilter();
+renderActiveDeckManagement();
 renderSavedCards();
