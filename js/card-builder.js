@@ -24,6 +24,65 @@ const cardBuilderDeck =
         "card-deck"
     );
 
+const CARD_BUILDER_ACTIVE_DECK_STORAGE_KEY =
+    "poof-active-deck-id";
+
+const CARD_BUILDER_ALL_DECKS_VALUE =
+    "all";
+
+function getCardBuilderActiveDeckId() {
+    const savedDeckId =
+        localStorage.getItem(
+            CARD_BUILDER_ACTIVE_DECK_STORAGE_KEY
+        );
+
+    if (
+        typeof savedDeckId !==
+            "string" ||
+        savedDeckId === "" ||
+        savedDeckId ===
+            CARD_BUILDER_ALL_DECKS_VALUE
+    ) {
+        return "default";
+    }
+
+    return savedDeckId;
+}
+
+function syncCardBuilderToActiveDeck() {
+    if (editingCardId !== null) {
+        return false;
+    }
+
+    const decksResult =
+        window.poofStorage
+            .getDecksResult();
+
+    if (!decksResult.success) {
+        return false;
+    }
+
+    const activeDeckId =
+        getCardBuilderActiveDeckId();
+
+    const activeDeckExists =
+        decksResult.decks.some(
+            (deck) =>
+                deck.id ===
+                activeDeckId
+        );
+
+    const targetDeckId =
+        activeDeckExists
+            ? activeDeckId
+            : "default";
+
+    cardBuilderDeck.value =
+        targetDeckId;
+
+    return true;
+}
+
 let editingCardId = null;
 
 function showCardBuilderMessage(message, state) {
@@ -111,7 +170,11 @@ function renderCardDeckOptions() {
         cardBuilderDeck.value =
             defaultDeck.id;
     }
-
+    
+    if (editingCardId === null) {
+        syncCardBuilderToActiveDeck();
+    }
+    
     return true;
 }
 
@@ -158,6 +221,8 @@ function resetCardBuilderMode() {
 
     cardBuilderForm.reset();
 
+    syncCardBuilderToActiveDeck();
+    
     cardBuilderTitle.textContent =
         "Create a card";
 
@@ -314,6 +379,11 @@ cardBuilderCancel.addEventListener(
 window.addEventListener(
     "poof:decks-changed",
     renderCardDeckOptions
+);
+
+window.addEventListener(
+    "poof:active-deck-changed",
+    syncCardBuilderToActiveDeck
 );
 
 renderCardDeckOptions();
