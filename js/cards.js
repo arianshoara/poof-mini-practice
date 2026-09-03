@@ -79,6 +79,36 @@ const renameDeckMessage =
         "rename-deck-message"
     );
 
+const deleteActiveDeckButton =
+    document.getElementById(
+        "delete-active-deck-button"
+    );
+
+const deleteDeckDialog =
+    document.getElementById(
+        "delete-deck-dialog"
+    );
+
+const deleteDeckDialogMessage =
+    document.getElementById(
+        "delete-deck-dialog-message"
+    );
+
+const deleteDeckDialogError =
+    document.getElementById(
+        "delete-deck-dialog-error"
+    );
+
+const cancelDeleteDeckButton =
+    document.getElementById(
+        "cancel-delete-deck"
+    );
+
+const confirmDeleteDeckButton =
+    document.getElementById(
+        "confirm-delete-deck"
+    );
+
 const SAVED_CARD_SORT_STORAGE_KEY =
     "poof-saved-card-sort";
 
@@ -303,6 +333,9 @@ function renderActiveDeckManagement() {
         renameDeckButton.disabled =
             true;
 
+        deleteActiveDeckButton.disabled =
+            true;
+
         return false;
     }
 
@@ -322,6 +355,9 @@ function renderActiveDeckManagement() {
         renameDeckButton.disabled =
             true;
 
+        deleteActiveDeckButton.disabled =
+            true;
+
         return false;
     }
 
@@ -336,6 +372,9 @@ function renderActiveDeckManagement() {
 
     renameDeckNameInput.value =
         activeDeck.name;
+
+    deleteActiveDeckButton.disabled =
+    activeDeck.is_default === true;
 
     return true;
 }
@@ -358,6 +397,9 @@ function cardMatchesActiveDeck(
 }
 
 let pendingDeleteCardId = null;
+
+let pendingDeleteDeckId = null;
+
 let savedCardSearchQuery = "";
 
 
@@ -726,6 +768,145 @@ function renderSavedCards() {
     savedCardList.replaceChildren(
         cardFragment
     );
+}
+
+function openDeleteDeckDialog() {
+    if (
+        savedCardDeckId ===
+        ALL_DECKS_FILTER_VALUE
+    ) {
+        return;
+    }
+
+    const selectedDeck =
+        window.poofStorage.getDeckById(
+            savedCardDeckId
+        );
+
+    if (!selectedDeck) {
+        return;
+    }
+
+    pendingDeleteDeckId =
+        selectedDeck.id;
+
+    deleteDeckDialogError.textContent =
+        "";
+
+    const cardCount =
+        window.poofStorage
+            .getCards()
+            .filter(
+                (card) =>
+                    card.deck_id ===
+                    selectedDeck.id
+            )
+            .length;
+
+    if (cardCount > 0) {
+        deleteDeckDialogMessage.textContent =
+            '"' +
+            selectedDeck.name +
+            '" contains ' +
+            cardCount +
+            (
+                cardCount === 1
+                    ? " card."
+                    : " cards."
+            ) +
+            " Move or delete them before deleting this deck.";
+
+        deleteDeckDialogError.textContent =
+            "Only empty decks can be deleted.";
+
+        confirmDeleteDeckButton.disabled =
+            true;
+    } else {
+        deleteDeckDialogMessage.textContent =
+            'Delete "' +
+            selectedDeck.name +
+            '"? This action cannot be undone.';
+
+        confirmDeleteDeckButton.disabled =
+            false;
+    }
+
+    deleteDeckDialog.showModal();
+
+    cancelDeleteDeckButton.focus();
+}
+
+function closeDeleteDeckDialog() {
+    deleteDeckDialog.close();
+}
+
+function confirmDeckDeletion() {
+    if (!pendingDeleteDeckId) {
+        return;
+    }
+
+    confirmDeleteDeckButton.disabled =
+        true;
+
+    const result =
+        window.poofStorage.deleteDeck(
+            pendingDeleteDeckId
+        );
+
+    if (!result.success) {
+        confirmDeleteDeckButton.disabled =
+            false;
+
+        deleteDeckDialogError.textContent =
+            result.error ||
+            "The deck could not be deleted.";
+
+        return;
+    }
+
+    savedCardDeckId =
+        ALL_DECKS_FILTER_VALUE;
+
+    saveSavedCardDeckId(
+        savedCardDeckId
+    );
+
+    deleteDeckDialog.close();
+
+    renderSavedCardDeckFilter();
+    renderActiveDeckManagement();
+    renderSavedCards();
+
+    window.dispatchEvent(
+        new CustomEvent(
+            "poof:decks-changed"
+        )
+    );
+
+    window.dispatchEvent(
+        new CustomEvent(
+            "poof:active-deck-changed",
+            {
+                detail: {
+                    deckId:
+                        savedCardDeckId
+                }
+            }
+        )
+    );
+}
+
+function resetDeleteDeckDialog() {
+    pendingDeleteDeckId = null;
+
+    deleteDeckDialogMessage.textContent =
+        "Are you sure you want to delete this deck?";
+
+    deleteDeckDialogError.textContent =
+        "";
+
+    confirmDeleteDeckButton.disabled =
+        false;
 }
 
 function openDeleteCardDialog(cardId) {
@@ -1188,6 +1369,26 @@ newDeckForm.addEventListener(
 renameDeckForm.addEventListener(
     "submit",
     handleRenameDeckSubmit
+);
+
+deleteActiveDeckButton.addEventListener(
+    "click",
+    openDeleteDeckDialog
+);
+
+cancelDeleteDeckButton.addEventListener(
+    "click",
+    closeDeleteDeckDialog
+);
+
+confirmDeleteDeckButton.addEventListener(
+    "click",
+    confirmDeckDeletion
+);
+
+deleteDeckDialog.addEventListener(
+    "close",
+    resetDeleteDeckDialog
 );
 
 savedCardDeckFilter.addEventListener(
