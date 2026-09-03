@@ -188,6 +188,44 @@
                 ></p>
             </form>
 
+            <form
+                id="rename-deck-form"
+                class="deck-create-form"
+            >
+                <label
+                    class="saved-card-search__label"
+                    for="rename-deck-name"
+                >
+                    Rename active deck
+                </label>
+            
+                <div class="deck-create-form__controls">
+                    <input
+                        id="rename-deck-name"
+                        class="saved-card-search__input"
+                        type="text"
+                        maxlength="80"
+                        placeholder="Select a deck first"
+                        autocomplete="off"
+                        required
+                    >
+            
+                    <button
+                        id="rename-deck-button"
+                        class="card-builder__submit"
+                        type="submit"
+                    >
+                        Rename
+                    </button>
+                </div>
+            
+                <p
+                    id="rename-deck-message"
+                    class="card-builder__message"
+                    aria-live="polite"
+                ></p>
+            </form>
+
             <div class="saved-card-search">
                   <label
                       class="saved-card-search__label"
