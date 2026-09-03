@@ -19,6 +19,11 @@ const cardBuilderCancel =
         "card-builder-cancel"
     );
 
+const cardBuilderDeck =
+    document.getElementById(
+        "card-deck"
+    );
+
 let editingCardId = null;
 
 function showCardBuilderMessage(message, state) {
@@ -31,6 +36,83 @@ function showCardBuilderMessage(message, state) {
             "is-" + state
         );
     }
+}
+
+function renderCardDeckOptions() {
+    const decksResult =
+        window.poofStorage
+            .getDecksResult();
+
+    const currentDeckId =
+        cardBuilderDeck.value ||
+        "default";
+
+    cardBuilderDeck.replaceChildren();
+
+    if (!decksResult.success) {
+        const unavailableOption =
+            document.createElement(
+                "option"
+            );
+
+        unavailableOption.value = "";
+        unavailableOption.textContent =
+            "Decks unavailable";
+
+        cardBuilderDeck.append(
+            unavailableOption
+        );
+
+        cardBuilderDeck.disabled = true;
+
+        return false;
+    }
+
+    cardBuilderDeck.disabled = false;
+
+    decksResult.decks.forEach(
+        (deck) => {
+            const option =
+                document.createElement(
+                    "option"
+                );
+
+            option.value = deck.id;
+            option.textContent =
+                deck.name;
+
+            cardBuilderDeck.append(
+                option
+            );
+        }
+    );
+
+    const currentDeckStillExists =
+        decksResult.decks.some(
+            (deck) =>
+                deck.id ===
+                currentDeckId
+        );
+
+    if (currentDeckStillExists) {
+        cardBuilderDeck.value =
+            currentDeckId;
+
+        return true;
+    }
+
+    const defaultDeck =
+        decksResult.decks.find(
+            (deck) =>
+                deck.is_default === true
+        );
+
+    if (defaultDeck) {
+        cardBuilderDeck.value =
+            defaultDeck.id;
+    }
+
+    return true;
 }
 
 function getFormValue(formData, fieldName) {
@@ -228,3 +310,10 @@ cardBuilderCancel.addEventListener(
     "click",
     cancelCardEditing
 );
+
+window.addEventListener(
+    "poof:decks-changed",
+    renderCardDeckOptions
+);
+
+renderCardDeckOptions();
