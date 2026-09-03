@@ -25,10 +25,24 @@
     <h2>Cards</h2>
     <p>Your saved vocabulary cards will appear here.</p>
 
-              <section
+          <div class="card-builder-toggle-wrap">
+              <button
+                  id="toggle-card-builder-button"
+                  class="card-builder-toggle"
+                  type="button"
+                  aria-expanded="false"
+                  aria-controls="card-builder-section"
+              >
+                  + New Card
+              </button>
+          </div>
+    
+         <section
+            id="card-builder-section"
             class="card-builder"
             aria-labelledby="card-builder-title"
-        >
+            hidden
+         >
             <h3 id="card-builder-title">
                 Create a card
             </h3>
