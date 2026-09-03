@@ -655,6 +655,11 @@ h1,
     outline-offset: 3px;
 }
 
+.saved-card__delete:disabled {
+    opacity: 0.45;
+    cursor: default;
+}
+
 .saved-card__actions {
     gap: 8px;
 }
