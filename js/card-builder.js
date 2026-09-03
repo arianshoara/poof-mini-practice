@@ -154,11 +154,15 @@ function renderCardDeckOptions() {
         );
 
     if (currentDeckStillExists) {
-        cardBuilderDeck.value =
-            currentDeckId;
-
-        return true;
-    }
+            cardBuilderDeck.value =
+                currentDeckId;
+        
+            if (editingCardId === null) {
+                syncCardBuilderToActiveDeck();
+            }
+        
+            return true;
+        }
 
     const defaultDeck =
         decksResult.decks.find(
