@@ -394,6 +394,22 @@ h1,
    CARDS PAGE
    ========================================================= */
 
+.cards-page-intro {
+    display: grid;
+    gap: 18px;
+
+    max-width: 720px;
+    margin: 0 auto;
+}
+
+.cards-page-intro__copy h2 {
+    margin: 0 0 6px;
+}
+
+.cards-page-intro__copy p {
+    color: var(--color-text-muted);
+}
+
 .cards-summary {
     max-width: 720px;
     margin: 28px auto 0;
@@ -421,10 +437,10 @@ h1,
 
 .card-builder-toggle-wrap {
     display: flex;
+    align-items: center;
     justify-content: flex-end;
 
-    max-width: 720px;
-    margin: 28px auto 0;
+    margin: 0;
 }
 
 .card-builder-toggle {
@@ -1117,5 +1133,86 @@ h1,
 
     .saved-card-sort__select {
         width: 100%;
+    }
+}
+
+/* =========================================================
+   CARDS PAGE — DESKTOP LAYOUT
+   ========================================================= */
+
+@media (min-width: 900px) {
+    .cards-page-intro,
+    .card-builder,
+    .cards-summary {
+        max-width: 1040px;
+    }
+
+    .cards-page-intro {
+        grid-template-columns:
+            minmax(0, 1fr) auto;
+
+        align-items: center;
+
+        margin-bottom: 24px;
+    }
+
+    .cards-page-intro__copy {
+        min-width: 0;
+    }
+
+    .card-builder-toggle-wrap {
+        align-self: center;
+    }
+
+    .card-builder-toggle {
+        min-width: 132px;
+    }
+
+    .card-builder {
+        margin-top: 0;
+    }
+
+    .cards-summary {
+        display: grid;
+        grid-template-columns:
+            minmax(0, 1fr) 220px;
+
+        column-gap: 18px;
+    }
+
+    .cards-summary > h3,
+    .cards-summary > #saved-cards-count,
+    .cards-summary > .deck-toolbar,
+    .cards-summary > #new-deck-form,
+    .cards-summary > #deck-actions-panel,
+    .cards-summary > .saved-card-list {
+        grid-column: 1 / -1;
+    }
+
+    .cards-summary > .saved-card-search {
+        grid-column: 1;
+        margin: 18px 0;
+    }
+
+    .cards-summary > .saved-card-sort {
+        grid-column: 2;
+
+        align-self: end;
+
+        margin: 18px 0;
+    }
+
+    .cards-summary >
+    .saved-card-sort
+    .saved-card-sort__label {
+        display: block;
+        margin-bottom: 8px;
+    }
+
+    .cards-summary >
+    .saved-card-sort
+    .saved-card-sort__select {
+        width: 100%;
+        min-width: 0;
     }
 }
