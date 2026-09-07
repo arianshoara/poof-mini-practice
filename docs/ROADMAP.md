@@ -8,8 +8,8 @@
 آخرین وضعیت فعلی پروژه:
 
 - آخرین Release رسمی: `v0.6.0`
-- وضعیت شاخه‌ی `main`: نسخه‌ی `v0.6.0` کامل، آزمایش و منتشر شده است.
-- Milestone فعال: `v0.7.0 — Deck Foundation`
+- وضعیت شاخه‌ی `main`: Implementation، Migration، Final Regression و مستندات `v0.7.0` کامل شده‌اند؛ Release Finalization هنوز باقی مانده است.
+- Milestone فعال: `v0.7.0 — Deck Foundation` در مرحله‌ی Final Repository Check و Release Finalization
 - مقصد این Roadmap: `v0.30.0 — POOF Mini Core Alpha`
 ---
 
@@ -532,17 +532,19 @@ Storage قدیمی بدون ازدست‌رفتن Cardها قابل خواندن
 
 #### وضعیت فعلی
 
-Milestone فعال پروژه است.
+Implementation، Schema Migration، Final Regression و مستندات این Milestone کامل شده‌اند.
 
-Implementation هنوز شروع نشده است.
+Definition of Done با Regression واقعی Card/Deck flow، Migration، Backup/Recovery، Classic/Snowy، Mobile/Desktop، Keyboard و Refresh State تأیید شده است.
 
+Tag و GitHub Release رسمی `v0.7.0` هنوز ساخته نشده‌اند.
 
+این Milestone در مرحله‌ی Final Repository Check و Release Finalization قرار دارد.
 
 #### هدف
 
-تبدیل `deck_id = "default"` از String صوری به Reference یک Entity واقعی.
+تبدیل `deck_id` از String صوری به Reference یک Deck Entity واقعی.
 
-#### مدل اولیه
+#### مدل فعلی
 
 ```text
 Deck
@@ -553,19 +555,68 @@ created_at
 updated_at
 ```
 
+Card Storage فعلی:
+
+```text
+schema_version: 2
+cards: [...]
+decks: [...]
+```
+
+رابطه‌ی اصلی:
+
+```text
+card.deck_id → deck.id
+```
+
 #### کارها
 
-- [ ] تعریف Deck Contract و Validation
-- [ ] ایجاد Default Deck در Migration
-- [ ] ساخت `getDecks()` و `getDeckById()`
-- [ ] ساخت `addDeck()`، `updateDeck()` و `deleteDeck()`
-- [ ] دریافت Deckهای واقعی در Card Builder
-- [ ] جلوگیری از Reference به Deck ناموجود
-- [ ] تعریف رفتار حذف Deck دارای Card
-- [ ] غیرقابل‌حذف‌بودن Default Deck
-- [ ] ساخت UI ساده‌ی مدیریت Deck
-- [ ] نمایش/فیلتر Cards براساس Deck
-- [ ] تست Referential Integrity و Migration
+- [x] تعریف Deck Contract و Validation
+- [x] ارتقای Card Storage به Schema v2
+- [x] ساخت Migration واقعی `v1 → v2`
+- [x] ایجاد Default Deck در Migration
+- [x] حفظ Card ID، `created_at` و Legacy `deck_id`
+- [x] ساخت `getDecks()`، `getDecksResult()` و `getDeckById()`
+- [x] ساخت `addDeck()`، `updateDeck()` و `deleteDeck()`
+- [x] دریافت Deckهای واقعی در Card Builder
+- [x] جلوگیری از Reference به Deck ناموجود
+- [x] تعریف رفتار حذف Deck دارای Card
+- [x] غیرقابل‌حذف‌بودن Default Deck
+- [x] ساخت UI مدیریت Deck
+- [x] ساخت Create Deck UI
+- [x] ساخت Rename Deck UI
+- [x] ساخت Safe Delete Deck UI
+- [x] نمایش و فیلتر Cards براساس Deck
+- [x] حفظ Active Deck بعد از Refresh
+- [x] هماهنگی Active Deck با Card Builder
+- [x] جلوگیری از Override شدن Deck واقعی هنگام Edit
+- [x] ساده‌سازی Deck management با Toolbar فشرده
+- [x] ساخت Collapsible Card Builder
+- [x] بهبود Responsive Layout برای Mobile و Desktop
+- [x] تست Referential Integrity و Migration
+- [x] Regression کامل Deck/Card user flow
+- [x] Regression کامل Storage Migration و Recovery
+- [x] تست Classic و Snowy
+- [x] تست Mobile در عرض‌های `320px` و `390px`
+- [x] تست Desktop
+- [x] تست Keyboard Focus و Refresh State
+- [x] ثبت نتایج واقعی در `docs/testing.md`
+- [x] ثبت معماری Deck در `docs/decisions.md`
+
+#### فایل‌های اصلی درگیر
+
+```text
+js/storage.js
+js/cards.js
+js/card-builder.js
+cards.html
+css/main.css
+docs/card-storage-contract.md
+docs/testing.md
+docs/decisions.md
+README.md
+docs/ROADMAP.md
+```
 
 #### یادگیری اصلی
 
@@ -575,11 +626,16 @@ one-to-many relation
 foreign-key concept
 referential integrity
 domain rules
+schema migration
+stable identity
+UI view state vs domain state
 ```
 
 #### Definition of Done
 
-کاربر بتواند Deck بسازد، Card را در Deck ذخیره/جابجا کند و هیچ Cardای به Deck نامعتبر اشاره نکند.
+کاربر بتواند Deck بسازد، Rename کند، Card را در Deck ذخیره یا جابه‌جا کند و Deck خالی غیرپیش‌فرض را حذف کند؛ هیچ Cardای به Deck نامعتبر اشاره نکند، داده‌ی Schema قبلی بدون Data Loss Migration شود و رفتار نهایی بعد از Refresh پایدار بماند.
+
+این Definition of Done با Regression نهایی `v0.7.0` تأیید شده است.
 
 ---
 
