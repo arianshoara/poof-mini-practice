@@ -266,6 +266,14 @@ getCardById(cardId)
 addCard(cardInput)
 updateCard(cardId, changes)
 deleteCard(cardId)
+
+getDecks()
+getDecksResult()
+getDeckById(deckId)
+addDeck(deckInput)
+updateDeck(deckId, changes)
+deleteDeck(deckId)
+
 getCardStorageRecoveryStatus()
 restoreCardStorageFromBackup(options)
 ```
@@ -320,25 +328,44 @@ Implementation، Migration/Recovery testing و Final Regression کامل شده�
   
 نسخه‌ی `v0.6.0` پس از تکمیل Implementation، Migration/Recovery Testing، Final Regression، مستندات، Tag و GitHub Release به‌صورت رسمی منتشر شده است.
 
-### `v0.7.0` — Deck Foundation 🚧
+### `v0.7.0` — Deck Foundation ✅
 
-Milestone فعال پروژه.
+Implementation، Migration، Final Regression و مستندات این Milestone کامل شده‌اند.
 
-Implementation هنوز شروع نشده است.
+هدف این نسخه تبدیل `deck_id` از یک String صوری به Reference یک Deck Entity واقعی بود.
 
-هدف این نسخه تبدیل `deck_id = "default"` از یک String صوری به Reference یک Deck Entity واقعی است.
+قابلیت‌های اصلی این نسخه:
 
-تمرکز اصلی این Milestone:
+- Card Storage Schema v2
+- Deck Entity واقعی با `id` پایدار و `name` قابل تغییر
+- Default Deck با ID ثابت `default`
+- Migration واقعی `Schema 1 → Schema 2`
+- حفظ Card ID، `created_at` و Legacy `deck_id` هنگام Migration
+- Deck Validation و Referential Integrity
+- `getDecks()`، `getDecksResult()` و `getDeckById()`
+- `addDeck()`، `updateDeck()` و `deleteDeck()`
+- جلوگیری از ساخت یا انتقال Card به Deck ناموجود
+- جلوگیری از حذف Default Deck
+- جلوگیری از حذف Deck دارای Card
+- Deck selector واقعی در Card Builder
+- فیلتر Cards براساس Active Deck
+- حفظ Active Deck بعد از Refresh
+- هماهنگی Active Deck با Card Builder
+- Create، Rename و Safe Delete Deck از UI
+- Deck management فشرده با Progressive Disclosure
+- Card Builder جمع‌شونده با `+ New Card`
+- Responsive Layout اختصاصی برای Mobile و Desktop
+- Regression کامل Card/Deck flow
+- Regression کامل Migration، Backup و Recovery
+- آزمایش Classic و Snowy
+- آزمایش Mobile `320px` و `390px`
+- آزمایش Desktop
+- آزمایش Keyboard Focus و Refresh State
+- بررسی Console بدون Error حل‌نشده‌ی مرتبط با پروژه
 
-- تعریف Deck Contract
-- ساخت Deck Entity واقعی
-- Default Deck معتبر
-- Deck CRUD
-- ارتباط واقعی Card و Deck
-- Referential Integrity
-- Migration واقعی Card Storage از Schema فعلی هنگام تغییر Data Contract
-- اتصال Deckهای واقعی به Card Builder
+Definition of Done نسخه با موفقیت تأیید شده است.
 
+`v0.7.0` اکنون در مرحله‌ی Final Repository Check و Release Finalization قرار دارد و هنوز Tag و GitHub Release رسمی آن ساخته نشده‌اند.
 ---
 
 ## Roadmap تا `v0.30.0`
