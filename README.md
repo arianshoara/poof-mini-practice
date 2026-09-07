@@ -365,7 +365,28 @@ Implementation، Migration، Final Regression و مستندات این Milestone
 
 Definition of Done نسخه با موفقیت تأیید شده است.
 
-`v0.7.0` اکنون در مرحله‌ی Final Repository Check و Release Finalization قرار دارد و هنوز Tag و GitHub Release رسمی آن ساخته نشده‌اند.
+نسخه‌ی `v0.7.0` پس از تکمیل Implementation، Migration، Final Regression، مستندات، Tag و GitHub Release به‌صورت رسمی منتشر شده است.
+
+### `v0.8.0` — Localization & Bidirectional UI Foundation 🚧
+
+Milestone فعال پروژه.
+
+Implementation هنوز شروع نشده است.
+
+هدف این نسخه حذف Stringهای رابط از فایل‌های Feature و آماده‌کردن UI واحد برای فارسی، آلمانی و انگلیسی است.
+
+تمرکز اصلی این Milestone:
+
+- تعریف Translation Key Contract
+- ساخت فایل‌های `fa`، `de` و `en`
+- ساخت Localization Service و `t(key)`
+- انتخاب UI Language و ذخیره‌ی Preference
+- تنظیم `html.lang` و جهت کلی صفحه
+- جداسازی UI Language از Target Content Language
+- استفاده از `lang` و `dir="auto"` برای متن‌های آموزشی
+- تعریف Fallback برای Missing Key
+- تست RTL/LTR و متن ترکیبی فارسی/آلمانی
+
 ---
 
 ## Roadmap تا `v0.30.0`
