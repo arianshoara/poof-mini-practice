@@ -39,6 +39,7 @@ The stored value is converted to JSON and uses this structure:
   "decks": []
 }
 
+```
 ### schema_version
 
 `schema_version` identifies the persisted Card Storage contract.
@@ -185,7 +186,7 @@ A manually created card uses:
 
 ---
 
-## Planned Schema Version 2 — Deck Foundation
+## Schema Version 2 — Deck Foundation
 
 Schema version 2 introduces real Deck entities.
 
