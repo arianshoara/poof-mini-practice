@@ -7,10 +7,11 @@
 
 آخرین وضعیت فعلی پروژه:
 
-- آخرین Release رسمی: `v0.6.0`
-- وضعیت شاخه‌ی `main`: Implementation، Migration، Final Regression و مستندات `v0.7.0` کامل شده‌اند؛ Release Finalization هنوز باقی مانده است.
-- Milestone فعال: `v0.7.0 — Deck Foundation` در مرحله‌ی Final Repository Check و Release Finalization
+- آخرین Release رسمی: `v0.7.0`
+- وضعیت شاخه‌ی `main`: نسخه‌ی `v0.7.0` کامل، آزمایش، مستندسازی و به‌صورت رسمی منتشر شده است.
+- Milestone فعال: `v0.8.0 — Localization & Bidirectional UI Foundation`
 - مقصد این Roadmap: `v0.30.0 — POOF Mini Core Alpha`
+  
 ---
 
 ## 1. این Repository قرار است چه شود؟
@@ -532,13 +533,13 @@ Storage قدیمی بدون ازدست‌رفتن Cardها قابل خواندن
 
 #### وضعیت فعلی
 
-Implementation، Schema Migration، Final Regression و مستندات این Milestone کامل شده‌اند.
+Implementation، Schema Migration، Final Regression، مستندات، Tag و GitHub Release این Milestone کامل شده‌اند.
 
 Definition of Done با Regression واقعی Card/Deck flow، Migration، Backup/Recovery، Classic/Snowy، Mobile/Desktop، Keyboard و Refresh State تأیید شده است.
 
-Tag و GitHub Release رسمی `v0.7.0` هنوز ساخته نشده‌اند.
+نسخه‌ی `v0.7.0` به‌صورت رسمی منتشر شده است.
 
-این Milestone در مرحله‌ی Final Repository Check و Release Finalization قرار دارد.
+این Milestone بسته شده و توسعه‌ی فعال به `v0.8.0` منتقل شده است.
 
 #### هدف
 
@@ -640,6 +641,15 @@ UI view state vs domain state
 ---
 
 ### `v0.8.0` — Localization & Bidirectional UI Foundation
+
+#### وضعیت فعلی
+
+Milestone فعال پروژه.
+
+Implementation هنوز شروع نشده است.
+
+نسخه‌ی قبلی `v0.7.0` به‌صورت رسمی منتشر شده و این Milestone اکنون مرحله‌ی فعال بعدی Roadmap است.
+
 
 #### هدف
 
