@@ -30,11 +30,13 @@ Other files must not depend on the storage key.
 
 ## Stored Structure
 
-The stored value will be converted to JSON and will use this structure:
+The stored value is converted to JSON and uses this structure:
 
+```json
 {
-  "schema_version": 1,
-  "cards": []
+  "schema_version": 2,
+  "cards": [],
+  "decks": []
 }
 
 ### schema_version
@@ -43,7 +45,7 @@ The stored value will be converted to JSON and will use this structure:
 
 The current version uses:
 
-`schema_version: 1`
+`schema_version: 2`
 
 The schema version changes only when the persisted data contract actually changes.
 
@@ -187,7 +189,7 @@ A manually created card uses:
 
 Schema version 2 introduces real Deck entities.
 
-The persisted structure will become:
+The persisted structure is:
 
     {
       "schema_version": 2,
@@ -195,7 +197,7 @@ The persisted structure will become:
       "decks": []
     }
 
-The application must not switch to schema version 2 until the migration and validation logic are implemented and tested.
+Schema version 2 is now the active persisted Card Storage contract. The v1 → v2 migration and Schema 2 validation are implemented and have passed regression testing.
 
 ### Deck Structure
 
@@ -225,7 +227,7 @@ Every Deck uses this structure:
 - May contain normal Unicode text, including Persian, German characters, spaces, symbols, and emoji.
 - Leading and trailing whitespace must be removed before storage.
 - Must remain non-empty after trimming.
-- Must not exceed 80 characters.
+- Must not exceed 80 Unicode code points.
 - Does not identify the Deck.
 - May be changed without changing the Deck ID.
 - Duplicate Deck names are allowed because Deck identity is determined by `id`.
@@ -351,29 +353,83 @@ If these conditions are not satisfied, migration must fail instead of writing th
 
 ## Storage Operations
 
-The storage layer will eventually provide these operations:
+The current public Storage API provides Card, Deck, and Recovery operations.
 
-### getCards()
+### Card operations
+
+#### getCards()
 
 Returns all personal cards.
 
-### getCardById(cardId)
+#### getCardsResult()
 
-Returns one card matching the given identifier.
+Returns Card read state and validated Card data.
 
-### addCard(card)
+#### getCardById(cardId)
 
-Validates and stores a new personal card.
+Returns one Card matching the given identifier.
 
-### updateCard(cardId, changes)
+#### addCard(cardInput)
 
-Updates an existing personal card without changing its identifier or creation date.
+Validates and stores a new personal Card.
 
-### deleteCard(cardId)
+The target `deck_id` must reference an existing Deck.
 
-Deletes one personal card.
+If no `deck_id` is provided, the Default Deck is used.
 
-The first implementation may introduce these operations gradually.
+#### updateCard(cardId, changes)
+
+Updates an existing Card without changing its identifier or creation date.
+
+If `deck_id` changes, the target Deck must exist.
+
+#### deleteCard(cardId)
+
+Deletes one personal Card.
+
+### Deck operations
+
+#### getDecks()
+
+Returns all stored Decks.
+
+#### getDecksResult()
+
+Returns Deck read state and validated Deck data.
+
+#### getDeckById(deckId)
+
+Returns one Deck matching the given identifier or `null`.
+
+#### addDeck(deckInput)
+
+Validates and stores a new non-default Deck.
+
+#### updateDeck(deckId, changes)
+
+Updates editable Deck fields while preserving stable Deck identity.
+
+Renaming a Deck does not change its `id`.
+
+#### deleteDeck(deckId)
+
+Deletes only an empty non-default Deck.
+
+The Default Deck cannot be deleted.
+
+A Deck referenced by one or more Cards cannot be deleted.
+
+### Recovery operations
+
+#### getCardStorageRecoveryStatus()
+
+Inspects the available backup through the normal parse, migration, and validation pipeline.
+
+#### restoreCardStorageFromBackup(options)
+
+Restores a valid backup only after explicit confirmation.
+
+The UI must continue using these public operations instead of accessing the Card Storage key directly.
 
 ---
 
