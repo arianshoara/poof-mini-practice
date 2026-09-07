@@ -748,4 +748,4 @@ Responsive UI در Mobile و Desktop، هر دو Theme، Keyboard navigation و 
 
 وضعیت:
 
-**v0.7.0 implementation, final regression and documentation complete — release finalization pending**
+**v0.7.0 implementation, final regression, documentation, tag and GitHub release complete — released**
