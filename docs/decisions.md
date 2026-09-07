@@ -837,3 +837,300 @@ This decision extends that architecture with real migration, backup, failure rep
 
 The earlier limitations in Decision 005 stating that Card Storage did not yet perform migrations or provide backup/recovery describe the state before `v0.6.0` and are superseded by this decision.
 
+---
+
+## Decision 007 — Model Decks as First-Class Card Storage Entities
+
+Status: Accepted
+
+Date: 2026-09-07
+
+### Context
+
+Before `v0.7.0`, every Card already contained a `deck_id`.
+
+However, Decks were not real stored entities.
+
+A value such as:
+
+`default`
+
+or another string inside:
+
+`card.deck_id`
+
+identified a logical grouping, but there was no Deck object with its own identity, name, timestamps, validation rules, or lifecycle.
+
+This created several limitations.
+
+The application could not safely:
+
+- List real Decks
+- Rename a Deck without changing its identity
+- Validate whether a Card referenced an existing Deck
+- Delete a Deck safely
+- Distinguish a Deck ID from its visible name
+- Store Deck metadata
+- Manage Decks through the shared Storage API
+
+POOF Mini Practice also needs to practice an important domain-modeling principle from the larger POOF project:
+
+An object that has its own identity, rules, lifecycle, and relationships should be represented as a real entity rather than remaining an implicit string value.
+
+### Decision
+
+Starting with `v0.7.0`, Decks are first-class entities inside the same persisted Card Storage envelope.
+
+The active persisted schema is:
+
+`schema_version: 2`
+
+The top-level Storage structure contains:
+
+```json
+{
+  "schema_version": 2,
+  "cards": [],
+  "decks": []
+}
+```
+
+Cards and Decks remain part of one Storage aggregate.
+
+Deck data is not stored under a separate Deck Storage key.
+
+### Deck Entity
+
+Every stored Deck contains:
+
+- `id`
+- `name`
+- `is_default`
+- `created_at`
+- `updated_at`
+
+The Deck ID represents stable identity.
+
+The Deck name represents user-visible mutable presentation.
+
+Renaming a Deck must therefore not change its ID.
+
+User-created Deck IDs are generated independently from the Deck name.
+
+### Deck Name Rules
+
+A Deck name must:
+
+- Be a string
+- Be trimmed before storage
+- Remain non-empty after trimming
+- Contain no more than 80 Unicode code points
+
+Duplicate Deck names are allowed.
+
+Deck identity must not depend on name uniqueness.
+
+This allows two Decks to have the same visible name while remaining separate entities through their IDs.
+
+### Default Deck
+
+Card Storage must always contain exactly one Default Deck.
+
+Its stable ID is:
+
+`default`
+
+The Default Deck must have:
+
+`is_default: true`
+
+The Default Deck:
+
+- May be renamed
+- Must not be deleted
+- Must remain the fallback Deck when a Card is created without an explicit `deck_id`
+
+The visible name of the Default Deck is not its identity.
+
+Changing its name does not change the stable ID:
+
+`default`
+
+### Card and Deck Relationship
+
+Every stored Card must reference exactly one existing Deck through:
+
+`card.deck_id`
+
+The relationship is:
+
+`card.deck_id → deck.id`
+
+Schema v2 validation rejects Storage when a Card references a Deck ID that does not exist.
+
+Card creation and Card updates also validate the target Deck before writing.
+
+The UI must not be able to create an orphan Card by supplying an unknown Deck ID.
+
+### Deck Deletion
+
+A non-default Deck may be deleted only when it contains no Cards.
+
+If any Card still references that Deck, deletion must fail.
+
+Deck deletion must not silently:
+
+- Delete Cards
+- Move Cards
+- Reassign Cards to the Default Deck
+
+Moving or deleting Cards is a separate explicit user action.
+
+This rule keeps destructive behavior visible and predictable.
+
+### Storage Boundary
+
+Deck operations use the same shared Storage layer established by Decision 005.
+
+The public Storage API now includes Deck operations such as:
+
+- `getDecksResult()`
+- `getDecks()`
+- `getDeckById(deckId)`
+- `addDeck(deckInput)`
+- `updateDeck(deckId, changes)`
+- `deleteDeck(deckId)`
+
+Card operations continue to use the same Storage layer.
+
+The Cards UI does not directly create, rename, delete, or validate persisted Deck entities through raw localStorage data.
+
+The flow remains:
+
+`UI → Public Storage API → Validation / Migration / Backup → localStorage`
+
+### Why Cards and Decks Share One Storage Envelope
+
+Cards and Decks are persisted together because their validity is relational.
+
+A Card is valid only when its `deck_id` references a Deck that exists in the same valid Storage state.
+
+Keeping both entities inside one envelope allows the Storage layer to validate the complete relationship before a write is accepted.
+
+It also allows backup and recovery to capture one consistent Card-and-Deck snapshot.
+
+Using separate Card and Deck Storage keys would create additional synchronization risks, such as:
+
+- A Card write succeeding while a Deck write fails
+- Restoring Cards without the matching Deck set
+- Reading a Card that references a Deck from a different Storage state
+
+For the current localStorage architecture, one validated aggregate is therefore preferred.
+
+### Migration from Schema 1 to Schema 2
+
+The introduction of real Deck entities is a structural persisted-data change.
+
+It therefore requires the explicit migration rule established by Decision 006.
+
+The migration:
+
+`Schema 1 → Schema 2`
+
+must preserve every valid existing Card.
+
+During migration:
+
+- A real Default Deck is created
+- Existing Card IDs are preserved
+- Existing Card `created_at` values are preserved
+- Existing Card `deck_id` values are preserved
+- One Deck is created for every distinct non-default legacy `deck_id`
+
+For a legacy Deck ID, the original ID remains the stable Deck ID.
+
+The visible Deck name is derived from the legacy ID.
+
+If the legacy ID is longer than 80 Unicode code points:
+
+- The full legacy ID remains unchanged
+- Only the visible Deck name is limited to the first 80 Unicode code points
+
+Migration must fail rather than write a Schema 2 structure that does not pass Schema 2 validation.
+
+### Active Deck View State
+
+The currently selected Deck in the Cards interface is not part of the Card Storage domain schema.
+
+It represents UI view preference rather than Deck identity or Card ownership.
+
+The current interface stores that selection separately using:
+
+`poof-active-deck-id`
+
+A value of:
+
+`all`
+
+represents the `All Decks` view and is not a real Deck entity.
+
+This UI preference must not create, delete, or modify persisted Deck entities.
+
+If preference storage is moved behind a shared settings adapter in a future version, the Deck domain model does not need to change.
+
+### Consequences
+
+Positive consequences:
+
+- Decks have explicit identity and lifecycle rules.
+- Deck names can change without breaking Card references.
+- Card-to-Deck referential integrity is validated centrally.
+- Orphan Card references are rejected.
+- The Default Deck has stable identity.
+- Deck deletion is explicit and safe.
+- Card and Deck data can be backed up and recovered as one consistent snapshot.
+- Legacy Card data can migrate without changing existing Card identity.
+- The UI can manage Decks without depending on the persisted Storage structure.
+- Future Storage providers can preserve the same Deck domain operations.
+
+Trade-offs:
+
+- Schema 2 is more complex than the previous Cards-only envelope.
+- Every Card write now depends on a valid Deck relationship.
+- Deck deletion requires checking Card references.
+- Card and Deck validation must remain synchronized.
+- Future structural changes to Deck data will require additional schema migrations.
+- The current implementation still uses localStorage and remains limited to one browser and device.
+
+### Current Limitations
+
+The current Deck model does not provide:
+
+- Remote synchronization
+- Authenticated Deck ownership
+- Cross-device Deck state
+- Deck sharing
+- Collaborative Decks
+- Nested Decks
+- Automatic Card reassignment when deleting a Deck
+- Server-side referential integrity
+
+These capabilities are outside the scope of `v0.7.0`.
+
+### Relationship to Decision 005
+
+Decision 005 established one shared Storage boundary for personal Card data.
+
+This decision extends that boundary so Deck domain data is also accessed through the same Storage layer.
+
+The Schema 1 envelope and Card-only public API described in Decision 005 represent the architecture before `v0.7.0`.
+
+The current persisted Card Storage contract is Schema 2 and includes both Cards and Decks.
+
+### Relationship to Decision 006
+
+Decision 006 requires every structural persisted-data change to provide an explicit migration path.
+
+Promoting Decks from implicit `deck_id` strings to real persisted entities is the first production use of that rule after `v0.6.0`.
+
+The `v1 → v2` migration, validation, backup, and recovery behavior therefore remain part of the same fail-safe Storage pipeline.
