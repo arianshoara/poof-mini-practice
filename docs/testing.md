@@ -1,4 +1,4 @@
-# چک‌لیست تست دستی پروژه
+``# چک‌لیست تست دستی پروژه
 
 این فایل نتیجه‌ی آزمایش‌های دستی پروژه را پیش از انتشار هر نسخه ثبت می‌کند.
 
@@ -483,3 +483,269 @@ Fixtureهای دائمی برای Baseline، Invalid JSON، Invalid Structure و
 وضعیت:
 
 **v0.6.0 implementation, migration/recovery testing, final regression, tag and GitHub release complete — released**
+
+---
+
+# تست نسخه‌ی v0.7.0 — Deck Foundation
+
+## Schema v2 و قرارداد Deck
+
+- [x] `schema_version: 2` به‌عنوان Schema فعال Card Storage آزمایش شد
+- [x] Storage نسخه‌ی 2 دارای آرایه‌ی `decks` است
+- [x] هر Deck دارای `id`، `name`، `is_default`، `created_at` و `updated_at` است
+- [x] شناسه‌های Deck باید یکتا باشند
+- [x] دقیقاً یک Deck پیش‌فرض وجود دارد
+- [x] Deck پیش‌فرض دارای ID ثابت `default` است
+- [x] هر Card باید به یک Deck موجود اشاره کند
+- [x] Card دارای `deck_id` یتیم به‌عنوان `invalid_structure` رد شد
+- [x] نام Deck پس از Trim نباید خالی باشد
+- [x] نام Deck حداکثر 80 Unicode code point دارد
+- [x] نام‌های تکراری Deck مجاز باقی ماندند
+- [x] Rename نام Deck، ID آن را تغییر نمی‌دهد
+
+## Migration واقعی v1 → v2
+
+- [x] Storage نسخه‌ی 1 از مسیر واقعی Read به نسخه‌ی 2 Migration شد
+- [x] Default Deck هنگام Migration ساخته شد
+- [x] Card IDهای قبلی حفظ شدند
+- [x] `created_at` کارت‌های قبلی حفظ شد
+- [x] `deck_id` کارت‌های قبلی حفظ شد
+- [x] برای هر Legacy Deck ID غیرپیش‌فرض یک Deck واقعی ساخته شد
+- [x] Legacy Deck ID بلند بدون تغییر به‌عنوان ID حفظ شد
+- [x] نام قابل‌نمایش Legacy Deck بلند به 80 Unicode code point محدود شد
+- [x] خروجی Migration با Schema v2 معتبر بود
+- [x] عبور دوباره‌ی Storage Migration‌شده از Read Pipeline تغییری در آن ایجاد نکرد
+- [x] Migration روی داده‌ی خراب به Write نامعتبر منجر نشد
+
+## Deck Read API
+
+APIهای زیر از مسیر واقعی Storage آزمایش شدند:
+
+- [x] `getDecksResult()`
+- [x] `getDecks()`
+- [x] `getDeckById()`
+- [x] Deck موجود با ID درست برگردانده شد
+- [x] Deck ناموجود مقدار `null` برگرداند
+- [x] خواندن Deckها باعث تغییر Cardهای موجود نشد
+
+## Create Deck
+
+- [x] Deck جدید از طریق `addDeck()` ساخته شد
+- [x] نام ورودی پیش از ذخیره Trim شد
+- [x] Deck جدید ID پایدار و مستقل از نام دریافت کرد
+- [x] Deck جدید `is_default: false` داشت
+- [x] Deck جدید بعد از Refresh باقی ماند
+- [x] نام خالی رد شد
+- [x] نام بیشتر از 80 Unicode code point رد شد
+- [x] ساخت Deck باعث آسیب به Cardهای موجود نشد
+
+## Rename Deck
+
+- [x] Deck واقعی با `updateDeck()` Rename شد
+- [x] ID Deck بعد از Rename ثابت باقی ماند
+- [x] `created_at` بعد از Rename ثابت باقی ماند
+- [x] `updated_at` بعد از Rename تغییر کرد
+- [x] Deck پیش‌فرض قابل Rename باقی ماند
+- [x] Rename با نام خالی رد شد
+- [x] Rename با نام بیشتر از 80 Unicode code point رد شد
+- [x] Rename Deck ناموجود رد شد
+- [x] Cardهای وابسته بعد از Rename سالم باقی ماندند
+
+## Delete Deck
+
+- [x] حذف Default Deck متوقف شد
+- [x] حذف Deck ناموجود متوقف شد
+- [x] حذف Deck غیرپیش‌فرض خالی موفق بود
+- [x] حذف Deck دارای Card متوقف شد
+- [x] Card داخل Deck دارای محتوا هنگام تلاش برای حذف جابه‌جا یا حذف نشد
+- [x] بعد از خارج‌کردن Cardها، Deck خالی قابل حذف شد
+- [x] حذف Deck از مسیر Write امن Storage انجام شد
+
+## Card ↔ Deck integrity
+
+- [x] ساخت Card داخل Deck موجود موفق بود
+- [x] ساخت Card با `deck_id` ناموجود متوقف شد
+- [x] Card بدون `deck_id` به Default Deck اختصاص داده شد
+- [x] Edit Card به Deck ناموجود متوقف شد
+- [x] انتقال Card میان دو Deck واقعی موفق بود
+- [x] Card بعد از انتقال و Refresh در Deck مقصد باقی ماند
+- [x] Validation نهایی هیچ Card یتیمی نشان نداد
+
+## Deck selector در Card Builder
+
+- [x] Dropdown ساخت Card از Deckهای واقعی Storage ساخته می‌شود
+- [x] مقدار Optionها از Deck ID واقعی استفاده می‌کند
+- [x] Card از UI داخل Deck انتخاب‌شده ذخیره شد
+- [x] هنگام Edit، Deck واقعی Card داخل Builder نمایش داده شد
+- [x] تغییر Deck هنگام Edit درست ذخیره شد
+
+## Active Deck و Filtering
+
+- [x] حالت `All Decks` همه‌ی Cardها را نمایش می‌دهد
+- [x] انتخاب یک Deck فقط Cardهای همان Deck را نمایش می‌دهد
+- [x] Empty State برای Deck خالی درست نمایش داده شد
+- [x] Active Deck بعد از Refresh حفظ شد
+- [x] Search داخل Active Deck درست کار کرد
+- [x] Sort داخل Active Deck درست کار کرد
+- [x] Active Deck واقعی با Card Builder هماهنگ شد
+- [x] حالت `All Decks` در Card Builder به Default Deck برمی‌گردد
+- [x] هنگام Edit، Deck واقعی Card بر Active Deck اولویت دارد
+
+## Deck Management UI
+
+- [x] Deck جدید از UI ساخته شد
+- [x] Deck ساخته‌شده خودکار Active Deck شد
+- [x] Deck ساخته‌شده بعد از Refresh فعال باقی ماند
+- [x] Rename از UI انجام شد
+- [x] Rename بلافاصله در Deck selector و Card Builder دیده شد
+- [x] Delete Deck از UI با Confirmation آزمایش شد
+- [x] Delete Deck دارای Card در UI مسدود شد
+- [x] Delete Deck خالی از UI موفق بود
+- [x] بعد از حذف Active Deck، View به `All Decks` برگشت
+- [x] Card Builder بعد از حذف Deck به وضعیت امن برگشت
+
+## Deck UI Simplification
+
+- [x] Deck management از فرم‌های همیشه‌باز به Toolbar فشرده تبدیل شد
+- [x] دکمه‌ی `+` فقط Create Deck را باز می‌کند
+- [x] دکمه‌ی `⋯` فقط Deck Actions را باز می‌کند
+- [x] Create Deck و Deck Actions هم‌زمان باز نمی‌مانند
+- [x] در حالت `All Decks` دکمه‌ی Deck Actions غیرفعال است
+- [x] Duplicate ID در Markup برطرف شد
+- [x] Deck selector فقط یک بار در DOM وجود دارد
+- [x] Error ناشی از Elementهای گمشده بعد از Fix برطرف شد
+
+## Collapsible Card Builder
+
+- [x] Card Builder در Load اولیه بسته است
+- [x] دکمه‌ی `+ New Card` فرم را باز می‌کند
+- [x] دکمه‌ی `Close` فرم را می‌بندد
+- [x] Save موفق Card Builder را می‌بندد
+- [x] Edit Card، Card Builder را خودکار باز می‌کند
+- [x] Cancel Edit فرم را می‌بندد
+- [x] بستن Builder هنگام Edit به‌صورت امن Edit را لغو می‌کند
+- [x] Active Deck هنگام بازشدن Card Builder حفظ می‌شود
+- [x] بعد از Refresh، Builder دوباره بسته شروع می‌شود
+
+## Regression کامل Deck و Card
+
+جریان کامل زیر با موفقیت آزمایش شد:
+
+`Create Deck → Refresh → Rename Deck → Refresh → Create Card → Refresh → Search → Sort → Block Delete Non-empty Deck → Edit Card → Move Card → Delete Empty Deck → Find Moved Card → Delete Card → Cleanup`
+
+- [x] Deck آزمایشی ساخته شد
+- [x] Active Deck بعد از Refresh حفظ شد
+- [x] Rename بعد از Refresh حفظ شد
+- [x] Card داخل Active Deck ساخته شد
+- [x] Card بعد از Refresh باقی ماند
+- [x] Search داخل Deck درست کار کرد
+- [x] Sort داخل Deck درست کار کرد
+- [x] Delete Deck دارای Card مسدود شد
+- [x] Card به Default Deck منتقل شد
+- [x] Deck خالی بعد از انتقال Card حذف شد
+- [x] Card منتقل‌شده بعد از حذف Deck باقی ماند
+- [x] Card آزمایشی در پایان حذف شد
+- [x] تعداد نهایی Cardها به مقدار قبل از Regression برگشت
+- [x] تعداد نهایی Deckها به مقدار قبل از Regression برگشت
+- [x] هیچ داده‌ی آزمایشی باقی نماند
+
+## Storage Safety Regression
+
+- [x] Migration واقعی Schema 1 به Schema 2 دوباره آزمایش شد
+- [x] Migration ID کارت را حفظ کرد
+- [x] Migration Legacy Deck reference را حفظ کرد
+- [x] Migration Default Deck را ساخت
+- [x] Migration Idempotency تأیید شد
+- [x] Future Schema با Status `future_version` متوقف شد
+- [x] Card یتیم با Status `invalid_structure` متوقف شد
+- [x] JSON خراب با Status `invalid_json` متوقف شد
+- [x] Failure Stateهای آزمایشی Primary Storage واقعی را تغییر ندادند
+
+## Backup و Recovery Regression
+
+- [x] Backup قبل از Write واقعی ساخته شد
+- [x] Backup دقیقاً با Primary Storage قبل از Write برابر بود
+- [x] Restore بدون تأیید صریح متوقف شد
+- [x] Restore تأییدشده از Backup سالم موفق بود
+- [x] Restore، Deck آزمایشی ایجادشده پس از Backup را حذف کرد
+- [x] تعداد Card و Deck بعد از Restore با Snapshot قبلی برابر شد
+- [x] Backup نسخه‌ی 1 پیش از Restore به نسخه‌ی 2 Migration شد
+- [x] Card موجود در Legacy Backup حفظ شد
+- [x] Legacy Deck هنگام Recovery ساخته شد
+- [x] Default Deck هنگام Recovery ساخته شد
+- [x] Backup خراب قابل Restore شناخته نشد
+- [x] Restore از Backup خراب Primary Storage را تغییر نداد
+- [x] Primary Storage اصلی بعد از Regression دقیقاً Restore شد
+- [x] Backup اصلی بعد از Regression دقیقاً Restore شد
+
+## Responsive Layout
+
+### Mobile
+
+- [x] Layout در عرض حدود `390px` بررسی شد
+- [x] Layout در عرض حدود `320px` بررسی شد
+- [x] Horizontal overflow مشاهده نشد
+- [x] Deck Toolbar در عرض باریک سالم باقی ماند
+- [x] Create Deck در Mobile قابل استفاده بود
+- [x] Deck Actions در Mobile قابل استفاده بود
+- [x] Collapsible Card Builder در Mobile درست کار کرد
+- [x] Search در Mobile قابل استفاده بود
+- [x] Sort در Mobile قابل استفاده بود
+- [x] Card grid در Mobile یک‌ستونه باقی ماند
+- [x] Delete Dialog داخل Viewport باقی ماند
+
+### Desktop
+
+- [x] Layout اختصاصی Desktop در عرض بیشتر از `900px` آزمایش شد
+- [x] Cards title و `+ New Card` در Desktop تراز مناسب داشتند
+- [x] Saved Cards از عرض Desktop بهتر استفاده کرد
+- [x] Search و Sort در Desktop کنار هم نمایش داده شدند
+- [x] Card grid در Desktop دو ستونه نمایش داده شد
+- [x] Card Builder در Desktop با Layout اصلی هماهنگ بود
+- [x] Deck management panels در Desktop سالم باقی ماندند
+
+## Theme و Accessibility Regression
+
+- [x] Cards در Theme کلاسیک بررسی شد
+- [x] Cards در Theme Snowy بررسی شد
+- [x] Card Builder در هر دو Theme خوانا باقی ماند
+- [x] Deck Toolbar در هر دو Theme خوانا باقی ماند
+- [x] Delete Dialog در هر دو Theme قابل استفاده بود
+- [x] Focus state کنترل‌های اصلی با Keyboard قابل مشاهده بود
+- [x] `+ New Card` با Keyboard فعال شد
+- [x] هنگام بازشدن Card Builder، Focus به Word منتقل شد
+
+## Refresh و Final Environment Check
+
+- [x] Active Deck بعد از Refresh حفظ شد
+- [x] Card Builder بعد از Refresh بسته شروع شد
+- [x] Create Deck panel بعد از Refresh بسته شروع شد
+- [x] Deck Actions panel بعد از Refresh بسته شروع شد
+- [x] تغییر Deck بدون Console Error انجام شد
+- [x] باز و بسته‌کردن Card Builder بدون Console Error انجام شد
+- [x] باز و بسته‌کردن Deck panels بدون Console Error انجام شد
+- [x] Search و Sort بدون Console Error انجام شدند
+- [x] `getCardsResult()` در پایان `success: true` برگرداند
+- [x] `getDecksResult()` در پایان `success: true` برگرداند
+- [x] Schema نهایی Storage برابر `2` بود
+- [x] Console Error حل‌نشده‌ی مرتبط با پروژه مشاهده نشد
+
+## نتیجه‌ی v0.7.0
+
+رفتار اصلی Deck از Storage تا UI با موفقیت آزمایش شد:
+
+`Schema v2 → migrate legacy data → validate Deck/Card relationships → manage Decks → filter Cards → persist active Deck`
+
+مسیر ایمنی Storage نیز بعد از اضافه‌شدن Deckها دوباره تأیید شد:
+
+`read → migrate → validate → backup before write → explicit recovery`
+
+جریان واقعی کاربر نیز انتها‌به‌انتها آزمایش شد:
+
+`Create Deck → Rename → Create Card → Filter → Search → Sort → Move Card → Safe Delete Deck → Delete Card → Refresh`
+
+Responsive UI در Mobile و Desktop، هر دو Theme، Keyboard navigation و Console نیز بررسی شدند.
+
+وضعیت:
+
+**v0.7.0 implementation and final regression complete — documentation and release finalization pending**
