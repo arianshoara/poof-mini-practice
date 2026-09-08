@@ -14,7 +14,7 @@
     const FALLBACK_UI_LANGUAGE =
         "en";
 
-       const UI_LANGUAGE_STORAGE_KEY =
+    const UI_LANGUAGE_STORAGE_KEY =
         "poof-ui-language";
 
     const UI_LANGUAGE_DIRECTIONS =
@@ -73,7 +73,7 @@
     let activeUiLanguage =
         readSavedUiLanguage();
 
-           function getUiLanguage() {
+    function getUiLanguage() {
         return activeUiLanguage;
     }
 
@@ -121,34 +121,6 @@
 
             return false;
         }
-    }
-
-    function setUiLanguage(
-        language
-    ) {
-        if (
-            !isValidUiLanguage(
-                language
-            )
-        ) {
-            console.warn(
-                "POOF i18n rejected unsupported UI language:",
-                language
-            );
-
-            return false;
-        }
-
-               activeUiLanguage =
-            language;
-
-        applyDocumentLanguage();
-
-        saveUiLanguage(
-            language
-        );
-
-        return true;
     }
 
     function getLocaleMessages(
@@ -285,7 +257,64 @@
         return EMERGENCY_TRANSLATION;
     }
 
-           applyDocumentLanguage();
+    function applyTranslations() {
+        const translationTargets =
+            document.querySelectorAll(
+                "[data-i18n]"
+            );
+
+        let translatedCount =
+            0;
+
+        translationTargets.forEach(
+            function (target) {
+                const translationKey =
+                    target.getAttribute(
+                        "data-i18n"
+                    );
+
+                target.textContent =
+                    t(translationKey);
+
+                translatedCount +=
+                    1;
+            }
+        );
+
+        return translatedCount;
+    }
+
+    function setUiLanguage(
+        language
+    ) {
+        if (
+            !isValidUiLanguage(
+                language
+            )
+        ) {
+            console.warn(
+                "POOF i18n rejected unsupported UI language:",
+                language
+            );
+
+            return false;
+        }
+
+        activeUiLanguage =
+            language;
+
+        applyDocumentLanguage();
+        applyTranslations();
+
+        saveUiLanguage(
+            language
+        );
+
+        return true;
+    }
+
+    applyDocumentLanguage();
+    applyTranslations();
 
     window.poofI18n =
         Object.freeze({
@@ -293,6 +322,7 @@
             setUiLanguage,
             isValidUiLanguage,
             applyDocumentLanguage,
+            applyTranslations,
             t
         });
 })();
