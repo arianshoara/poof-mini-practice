@@ -66,8 +66,54 @@
     let activeUiLanguage =
         readSavedUiLanguage();
 
-    function getUiLanguage() {
+        function getUiLanguage() {
         return activeUiLanguage;
+    }
+
+    function saveUiLanguage(
+        language
+    ) {
+        try {
+            window.localStorage.setItem(
+                UI_LANGUAGE_STORAGE_KEY,
+                language
+            );
+
+            return true;
+        } catch (error) {
+            console.warn(
+                "POOF i18n could not save the UI language.",
+                error
+            );
+
+            return false;
+        }
+    }
+
+    function setUiLanguage(
+        language
+    ) {
+        if (
+            !isValidUiLanguage(
+                language
+            )
+        ) {
+            console.warn(
+                "POOF i18n rejected unsupported UI language:",
+                language
+            );
+
+            return false;
+        }
+
+        activeUiLanguage =
+            language;
+
+        saveUiLanguage(
+            language
+        );
+
+        return true;
     }
 
     function getLocaleMessages(
@@ -204,9 +250,10 @@
         return EMERGENCY_TRANSLATION;
     }
 
-    window.poofI18n =
+        window.poofI18n =
         Object.freeze({
             getUiLanguage,
+            setUiLanguage,
             isValidUiLanguage,
             t
         });
