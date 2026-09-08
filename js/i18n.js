@@ -27,6 +27,18 @@
     const EMERGENCY_TRANSLATION =
         "Translation unavailable";
 
+    const TRANSLATABLE_ATTRIBUTES =
+    Object.freeze({
+        "data-i18n-placeholder":
+            "placeholder",
+
+        "data-i18n-aria-label":
+            "aria-label",
+
+        "data-i18n-title":
+            "title"
+    });    
+
     function isPlainObject(value) {
         return (
             value !== null &&
@@ -257,6 +269,47 @@
         return EMERGENCY_TRANSLATION;
     }
 
+    function applyAttributeTranslations() {
+        let translatedCount =
+            0;
+
+        Object.entries(
+            TRANSLATABLE_ATTRIBUTES
+        ).forEach(
+            function (attributePair) {
+                const sourceAttribute =
+                    attributePair[0];
+
+                const targetAttribute =
+                    attributePair[1];
+
+                const translationTargets =
+                    document.querySelectorAll(
+                        `[${sourceAttribute}]`
+                    );
+
+                translationTargets.forEach(
+                    function (target) {
+                        const translationKey =
+                            target.getAttribute(
+                                sourceAttribute
+                            );
+
+                        target.setAttribute(
+                            targetAttribute,
+                            t(translationKey)
+                        );
+
+                        translatedCount +=
+                            1;
+                    }
+                );
+            }
+        );
+
+        return translatedCount;
+    }
+
     function applyTranslations() {
         const translationTargets =
             document.querySelectorAll(
@@ -280,6 +333,9 @@
                     1;
             }
         );
+
+        translatedCount +=
+            applyAttributeTranslations();
 
         return translatedCount;
     }
