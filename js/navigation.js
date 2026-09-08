@@ -2,13 +2,54 @@ const navigation = document.querySelector("#main-navigation");
 
 navigation.innerHTML = `
     <ul>
-        <li><a href="account.html">Account</a></li>
-        <li><a href="learn.html">Learn</a></li>
-        <li><a href="index.html">Home</a></li>
-        <li><a href="cards.html">Cards</a></li>
-        <li><a href="library.html">Library</a></li>
+        <li>
+            <a
+                href="account.html"
+                data-i18n="nav.account"
+            >
+                Account
+            </a>
+        </li>
+
+        <li>
+            <a
+                href="learn.html"
+                data-i18n="nav.learn"
+            >
+                Learn
+            </a>
+        </li>
+
+        <li>
+            <a
+                href="index.html"
+                data-i18n="nav.home"
+            >
+                Home
+            </a>
+        </li>
+
+        <li>
+            <a
+                href="cards.html"
+                data-i18n="nav.cards"
+            >
+                Cards
+            </a>
+        </li>
+
+        <li>
+            <a
+                href="library.html"
+                data-i18n="nav.library"
+            >
+                Library
+            </a>
+        </li>
     </ul>
 `;
+
+window.poofI18n.applyTranslations();
 
 const currentPage =
     window.location.pathname.split("/").pop() || "index.html";
