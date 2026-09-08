@@ -32,6 +32,12 @@
                 "Karten",
 
             "nav.account":
-                "Konto"
+                "Konto",
+
+            "cards.search.label":
+                "Gespeicherte Karten durchsuchen",
+
+            "cards.search.placeholder":
+                "Nach Wort, Bedeutung oder Beispiel suchen..."
         });
 })();

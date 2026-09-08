@@ -32,6 +32,12 @@
                 "Cards",
 
             "nav.account":
-                "Account"
+                "Account",
+
+            "cards.search.label":
+                "Search saved cards",
+
+            "cards.search.placeholder":
+                "Search by word, meaning or example..."
         });
 })();
