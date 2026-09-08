@@ -14,8 +14,15 @@
     const FALLBACK_UI_LANGUAGE =
         "en";
 
-    const UI_LANGUAGE_STORAGE_KEY =
+       const UI_LANGUAGE_STORAGE_KEY =
         "poof-ui-language";
+
+    const UI_LANGUAGE_DIRECTIONS =
+        Object.freeze({
+            fa: "rtl",
+            de: "ltr",
+            en: "ltr"
+        });
 
     const EMERGENCY_TRANSLATION =
         "Translation unavailable";
@@ -66,8 +73,34 @@
     let activeUiLanguage =
         readSavedUiLanguage();
 
-        function getUiLanguage() {
+           function getUiLanguage() {
         return activeUiLanguage;
+    }
+
+    function getUiDirection(
+        language
+    ) {
+        return (
+            UI_LANGUAGE_DIRECTIONS[
+                language
+            ] ||
+            UI_LANGUAGE_DIRECTIONS[
+                DEFAULT_UI_LANGUAGE
+            ]
+        );
+    }
+
+    function applyDocumentLanguage() {
+        const documentRoot =
+            document.documentElement;
+
+        documentRoot.lang =
+            activeUiLanguage;
+
+        documentRoot.dir =
+            getUiDirection(
+                activeUiLanguage
+            );
     }
 
     function saveUiLanguage(
@@ -106,8 +139,10 @@
             return false;
         }
 
-        activeUiLanguage =
+               activeUiLanguage =
             language;
+
+        applyDocumentLanguage();
 
         saveUiLanguage(
             language
@@ -250,11 +285,14 @@
         return EMERGENCY_TRANSLATION;
     }
 
-        window.poofI18n =
+           applyDocumentLanguage();
+
+    window.poofI18n =
         Object.freeze({
             getUiLanguage,
             setUiLanguage,
             isValidUiLanguage,
+            applyDocumentLanguage,
             t
         });
 })();
